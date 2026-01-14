@@ -1,0 +1,71 @@
+{
+  "startedAt": "2026-01-14T04:58:34.678Z",
+  "teams": [
+    {
+      "id": "90132794332",
+      "name": "Visio",
+      "spaces": [
+        {
+          "id": "901312077422",
+          "name": "Desenvolvimento",
+          "folders": [
+            {
+              "id": "901315445357",
+              "name": "Sprints",
+              "lists": [
+                {
+                  "id": "901323029188",
+                  "name": "Sprint 1 (12/1 - 12/14)"
+                },
+                {
+                  "id": "901323482046",
+                  "name": "Sprint 2 (12/15 - 12/28)"
+                },
+                {
+                  "id": "901323910933",
+                  "name": "Sprint 3 (12/29 - 1/11)"
+                },
+                {
+                  "id": "901324210619",
+                  "name": "Sprint 4 (1/12 - 1/25)"
+                }
+              ]
+            }
+          ],
+          "folderlessLists": [
+            {
+              "id": "901323682669",
+              "name": "Épicos"
+            },
+            {
+              "id": "901322873791",
+              "name": "Backlog"
+            }
+          ]
+        },
+        {
+          "id": "901312157730",
+          "name": "Produto e Design",
+          "folders": [
+            {
+              "id": "901316132902",
+              "name": "Sprints",
+              "lists": [
+                {
+                  "id": "901324036890",
+                  "name": "Sprint 1 (1/12 - 1/25)"
+                }
+              ]
+            }
+          ],
+          "folderlessLists": [
+            {
+              "id": "901323029354",
+              "name": "Backlog"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

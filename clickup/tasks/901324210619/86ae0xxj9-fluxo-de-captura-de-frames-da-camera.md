@@ -2,13 +2,13 @@
 
 ID: 86ae0xxj9  
 Status: to do  
-Assignee(s): —  
+Assignee(s): Matheus Candido  
 Prioridade: —  
 List: Sprint 4 (1/12 - 1/25)  
 
 Datas:
 - Criado: 2025-12-18
-- Atualizado: 2026-01-13
+- Atualizado: 2026-01-23
 - Due: —
 
 ## Descrição
@@ -28,4 +28,5 @@ Verificar se tem como a camera enviar eventos para a gente
 Caso o HTTP não funcione, precisamos entender melhor o RTPS com o FFMPEG
 
 ## Custom Fields
-- —
+- Módulo/Épico: 7
+- Versão: 0

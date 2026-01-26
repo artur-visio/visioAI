@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-01-14T14:13:00.356Z",
+  "startedAt": "2026-01-24T13:11:19.939Z",
   "teams": [
     {
       "id": "90132794332",
@@ -7,7 +7,7 @@
       "spaces": [
         {
           "id": "901312077422",
-          "name": "Desenvolvimento",
+          "name": "Tech",
           "folders": [
             {
               "id": "901315445357",
@@ -62,6 +62,17 @@
             {
               "id": "901323029354",
               "name": "Backlog"
+            }
+          ]
+        },
+        {
+          "id": "901312883573",
+          "name": "Hardware",
+          "folders": [],
+          "folderlessLists": [
+            {
+              "id": "901324619921",
+              "name": "List"
             }
           ]
         }

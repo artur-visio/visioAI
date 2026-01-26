@@ -1,14 +1,14 @@
 # Cadastro de faces no findface - M
 
 ID: 86aeg3yyn  
-Status: to do  
+Status: complete  
 Assignee(s): Esau Bandeira  
 Prioridade: —  
 List: Sprint 4 (1/12 - 1/25)  
 
 Datas:
 - Criado: 2026-01-13
-- Atualizado: 2026-01-13
+- Atualizado: 2026-01-20
 - Due: —
 
 ## Descrição
@@ -29,8 +29,12 @@ Sem colocar nenhum dado pessoal que não seja a foto no findface
 Listas
 A premissa será 1 lista por organizationID, o nome da lista será o ID da Organização
 
+Regras
+Unicidade por CPF e OrganizationID, caso o CPF exista
+Precisamos criar um Hash de ID+OrgId e usar no nome do card no FindFace, salvando esse hash na tabela de face na CMS-API
 Documentação
 [1] Acessar a documentação da nossa maquina, ver o IP
 
 ## Custom Fields
-- —
+- Módulo/Épico: —
+- Versão: 0

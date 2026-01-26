@@ -8,11 +8,12 @@ List: Backlog
 
 Datas:
 - Criado: 2025-12-04
-- Atualizado: 2025-12-23
+- Atualizado: 2026-01-23
 - Due: —
 
 ## Descrição
 —
 
 ## Custom Fields
-- Menu suspenso personalizado: 0
+- Módulo/Épico: 0
+- Versão: 3

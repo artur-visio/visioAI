@@ -1,14 +1,14 @@
 # Criação do servidor DDNS (heartbeat) para atualizar ip das cameras - M
 
 ID: 86aef4jc2  
-Status: to do  
-Assignee(s): —  
+Status: in progress  
+Assignee(s): Felipe Nogueira Gaudio  
 Prioridade: —  
 List: Sprint 4 (1/12 - 1/25)  
 
 Datas:
 - Criado: 2026-01-12
-- Atualizado: 2026-01-13
+- Atualizado: 2026-01-23
 - Due: —
 
 ## Descrição
@@ -60,4 +60,5 @@ Teste automatizado cobrindo os cenários acima (precisa nesse momento?)
 Anexo
 
 ## Custom Fields
-- —
+- Módulo/Épico: 2
+- Versão: 0

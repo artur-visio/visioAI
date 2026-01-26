@@ -1,14 +1,14 @@
 # Cadastro de lista no findface por Organization - P
 
 ID: 86aeg6en5  
-Status: to do  
+Status: complete  
 Assignee(s): Esau Bandeira  
-Prioridade: —  
+Prioridade: high  
 List: Sprint 4 (1/12 - 1/25)  
 
 Datas:
 - Criado: 2026-01-13
-- Atualizado: 2026-01-13
+- Atualizado: 2026-01-20
 - Due: —
 
 ## Descrição
@@ -29,4 +29,5 @@ Documentação
 [1] Acessar a documentação da nossa maquina, ver o IP
 
 ## Custom Fields
-- —
+- Módulo/Épico: —
+- Versão: 0

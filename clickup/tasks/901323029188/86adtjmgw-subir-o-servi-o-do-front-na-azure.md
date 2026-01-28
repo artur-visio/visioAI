@@ -1,10 +1,11 @@
 # Subir o serviço do front na azure
 
-ID: 86adtjmgw  
-Status: complete  
-Assignee(s): Filipe Lins  
-Prioridade: —  
-List: Sprint 1 (12/1 - 12/14)  
+ID: 86adtjmgw
+Custom ID: TECH-30
+Status: complete
+Assignee(s): Filipe Lins
+Prioridade: —
+List: Sprint 1 (12/1 - 12/14)
 
 Datas:
 - Criado: 2025-12-08

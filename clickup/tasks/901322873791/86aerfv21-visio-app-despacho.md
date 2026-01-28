@@ -1,10 +1,11 @@
 # Visio App - Despacho
 
-ID: 86aerfv21  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86aerfv21
+Custom ID: TECH-190
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-23
@@ -12,8 +13,8 @@ Datas:
 - Due: —
 
 ## Descrição
-—
+*
 
 ## Custom Fields
-- Módulo/Épico: 8
 - Versão: 1
+- Módulo/Épico: 8

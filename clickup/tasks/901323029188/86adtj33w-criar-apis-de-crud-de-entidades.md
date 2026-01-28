@@ -1,10 +1,11 @@
 # Criar APIs de CRUD de entidades
 
-ID: 86adtj33w  
-Status: complete  
-Assignee(s): Matheus Candido  
-Prioridade: —  
-List: Sprint 1 (12/1 - 12/14)  
+ID: 86adtj33w
+Custom ID: TECH-27
+Status: complete
+Assignee(s): Matheus Candido
+Prioridade: —
+List: Sprint 1 (12/1 - 12/14)
 
 Datas:
 - Criado: 2025-12-08

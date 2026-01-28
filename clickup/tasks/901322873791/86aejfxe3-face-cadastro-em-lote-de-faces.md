@@ -1,10 +1,11 @@
 # Face: Cadastro em lote de faces
 
-ID: 86aejfxe3  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86aejfxe3
+Custom ID: TECH-165
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-15
@@ -15,5 +16,5 @@ Datas:
 —
 
 ## Custom Fields
-- Módulo/Épico: 0
 - Versão: 3
+- Módulo/Épico: 0

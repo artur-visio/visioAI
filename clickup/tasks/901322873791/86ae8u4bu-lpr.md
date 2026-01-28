@@ -1,10 +1,11 @@
 # LPR
 
-ID: 86ae8u4bu  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86ae8u4bu
+Custom ID: TECH-128
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-05
@@ -15,5 +16,5 @@ Datas:
 —
 
 ## Custom Fields
-- Módulo/Épico: 1
 - Versão: 0
+- Módulo/Épico: 1

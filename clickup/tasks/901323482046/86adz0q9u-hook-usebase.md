@@ -1,10 +1,11 @@
 # hook useBase
 
-ID: 86adz0q9u  
-Status: complete  
-Assignee(s): Filipe Lins  
-Prioridade: —  
-List: Sprint 2 (12/15 - 12/28)  
+ID: 86adz0q9u
+Custom ID: TECH-56
+Status: complete
+Assignee(s): Filipe Lins
+Prioridade: —
+List: Sprint 2 (12/15 - 12/28)
 
 Datas:
 - Criado: 2025-12-16

@@ -1,10 +1,11 @@
 # Desenho de arquitetura de camera
 
-ID: 86adw7qbv  
-Status: complete  
-Assignee(s): —  
-Prioridade: —  
-List: Sprint 2 (12/15 - 12/28)  
+ID: 86adw7qbv
+Custom ID: TECH-36
+Status: complete
+Assignee(s): —
+Prioridade: —
+List: Sprint 2 (12/15 - 12/28)
 
 Datas:
 - Criado: 2025-12-11
@@ -12,10 +13,10 @@ Datas:
 - Due: —
 
 ## Descrição
-Facial e LPR
-Aovivo
-Frame
-Busca video o SD
+- [x] Facial e LPR
+- [x] Aovivo
+- [ ] Frame
+- [ ] Busca video o SD
 
 ## Custom Fields
 - —

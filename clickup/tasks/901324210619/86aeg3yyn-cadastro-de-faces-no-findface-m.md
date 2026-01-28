@@ -1,10 +1,11 @@
 # Cadastro de faces no findface - M
 
-ID: 86aeg3yyn  
-Status: complete  
-Assignee(s): Esau Bandeira  
-Prioridade: —  
-List: Sprint 4 (1/12 - 1/25)  
+ID: 86aeg3yyn
+Custom ID: TECH-154
+Status: complete
+Assignee(s): Esau Bandeira
+Prioridade: —
+List: Sprint 4 (1/12 - 1/25)
 
 Datas:
 - Criado: 2026-01-13
@@ -12,29 +13,29 @@ Datas:
 - Due: —
 
 ## Descrição
-Objetivo
+### Objetivo
 Precisamos casar a CMS com a findface, garantindo que inserções, atualiações e deleções na entidade de face replique fazendo o que for necessário na findface
 
 Fazer tudo que for necessário para inserir no findface, Face e o CardHuman
 
 Vamos usar os mesmos endpoints de facial nossa usando os endpoints existentes
-https://api-dev.visio.io/cms/docs#tag/facial
-Como
+[https://api-dev.visio.io/cms/docs#tag/facial](https://api-dev.visio.io/cms/docs#tag/facial)
+### Como
 Vamos fazer diretamente na CMS api, sem nenhum serviço adicional para isso
-vamos fazer via http service 
+vamos fazer via http service
 Garantir que tudo seja uma transaction, para proteger contra inconsistência
 Vamos utilizar o ID da face da CMS api como ID no findface,
 Sem colocar nenhum dado pessoal que não seja a foto no findface
 
-Listas
+**Listas**
 A premissa será 1 lista por organizationID, o nome da lista será o ID da Organização
 
-Regras
-Unicidade por CPF e OrganizationID, caso o CPF exista
-Precisamos criar um Hash de ID+OrgId e usar no nome do card no FindFace, salvando esse hash na tabela de face na CMS-API
-Documentação
-[1] Acessar a documentação da nossa maquina, ver o IP
+### Regras
+*   Unicidade por CPF e OrganizationID, caso o CPF exista
+*   Precisamos criar um Hash de ID+OrgId e usar no nome do card no FindFace, salvando esse hash na tabela de face na CMS-API
+### Documentação
+\[1\] Acessar a documentação da nossa maquina, ver o IP
 
 ## Custom Fields
-- Módulo/Épico: —
 - Versão: 0
+- Módulo/Épico: —

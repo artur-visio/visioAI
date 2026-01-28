@@ -1,10 +1,11 @@
 # Integração com cameras
 
-ID: 86ae362r1  
-Status: not started  
-Assignee(s): —  
-Prioridade: —  
-List: Épicos  
+ID: 86ae362r1
+Custom ID: TECH-99
+Status: not started
+Assignee(s): —
+Prioridade: —
+List: Épicos
 
 Datas:
 - Criado: 2025-12-23

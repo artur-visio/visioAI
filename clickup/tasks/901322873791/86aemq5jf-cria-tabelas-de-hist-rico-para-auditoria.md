@@ -1,10 +1,11 @@
 # Cria tabelas de histórico para auditoria
 
-ID: 86aemq5jf  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86aemq5jf
+Custom ID: TECH-171
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-19
@@ -15,5 +16,5 @@ Datas:
 Tabela de auditoria pensando a nível global
 
 ## Custom Fields
-- Módulo/Épico: —
 - Versão: 1
+- Módulo/Épico: —

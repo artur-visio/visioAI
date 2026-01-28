@@ -1,10 +1,11 @@
 # Backoffice para time visio mexer nas permissões
 
-ID: 86adtj1dr  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86adtj1dr
+Custom ID: TECH-23
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2025-12-08
@@ -15,5 +16,5 @@ Datas:
 —
 
 ## Custom Fields
-- Módulo/Épico: 6
 - Versão: 1
+- Módulo/Épico: 6

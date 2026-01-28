@@ -1,10 +1,11 @@
 # Fluxo de reconhecimento facial
 
-ID: 86ae3633n  
-Status: not started  
-Assignee(s): —  
-Prioridade: —  
-List: Épicos  
+ID: 86ae3633n
+Custom ID: TECH-100
+Status: not started
+Assignee(s): —
+Prioridade: —
+List: Épicos
 
 Datas:
 - Criado: 2025-12-23

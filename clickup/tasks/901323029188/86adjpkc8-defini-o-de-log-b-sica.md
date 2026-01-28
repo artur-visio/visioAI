@@ -1,10 +1,11 @@
 # Definição de log básica
 
-ID: 86adjpkc8  
-Status: complete  
-Assignee(s): Artur Antunes  
-Prioridade: —  
-List: Sprint 1 (12/1 - 12/14)  
+ID: 86adjpkc8
+Custom ID: TECH-9
+Status: complete
+Assignee(s): Artur Antunes
+Prioridade: —
+List: Sprint 1 (12/1 - 12/14)
 
 Datas:
 - Criado: 2025-11-28

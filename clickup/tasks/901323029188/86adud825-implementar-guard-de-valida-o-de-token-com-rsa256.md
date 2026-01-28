@@ -1,10 +1,11 @@
 # Implementar Guard de validação de token com rsa256
 
-ID: 86adud825  
-Status: complete  
-Assignee(s): Esau Bandeira  
-Prioridade: —  
-List: Sprint 1 (12/1 - 12/14)  
+ID: 86adud825
+Custom ID: TECH-32
+Status: complete
+Assignee(s): Esau Bandeira
+Prioridade: —
+List: Sprint 1 (12/1 - 12/14)
 
 Datas:
 - Criado: 2025-12-09

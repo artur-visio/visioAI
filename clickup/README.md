@@ -1,6 +1,6 @@
 # ClickUp Sync (VISIO)
 
-Atualizado em: 2026-01-24T13:11:27.781Z
+Atualizado em: 2026-01-28T13:08:24.748Z
 
 ## Spaces
 - [901312077422-desenvolvimento](./spaces/901312077422-desenvolvimento.md)

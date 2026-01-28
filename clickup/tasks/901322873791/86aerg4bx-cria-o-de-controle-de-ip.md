@@ -1,10 +1,11 @@
 # Criação de controle de IP
 
-ID: 86aerg4bx  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86aerg4bx
+Custom ID: TECH-192
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-23
@@ -15,5 +16,5 @@ Datas:
 —
 
 ## Custom Fields
-- Módulo/Épico: 3
 - Versão: 3
+- Módulo/Épico: 3

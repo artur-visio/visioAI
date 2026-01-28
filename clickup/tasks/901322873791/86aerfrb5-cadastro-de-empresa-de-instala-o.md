@@ -1,10 +1,11 @@
 # Cadastro de empresa de instalação
 
-ID: 86aerfrb5  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86aerfrb5
+Custom ID: TECH-186
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-23
@@ -15,5 +16,5 @@ Datas:
 —
 
 ## Custom Fields
-- Módulo/Épico: 6
 - Versão: 3
+- Módulo/Épico: 6

@@ -1,10 +1,11 @@
 # Arquitetura Front
 
-ID: 86adjpj6k  
-Status: complete  
-Assignee(s): —  
-Prioridade: —  
-List: Sprint 1 (12/1 - 12/14)  
+ID: 86adjpj6k
+Custom ID: TECH-7
+Status: complete
+Assignee(s): —
+Prioridade: —
+List: Sprint 1 (12/1 - 12/14)
 
 Datas:
 - Criado: 2025-11-28

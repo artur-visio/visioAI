@@ -1,10 +1,11 @@
 # Criação do release notes
 
-ID: 86aerfw3h  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86aerfw3h
+Custom ID: TECH-191
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-23
@@ -15,5 +16,5 @@ Datas:
 Pensar se não é um documento do clickup integrado a plataforma
 
 ## Custom Fields
-- Módulo/Épico: —
 - Versão: 1
+- Módulo/Épico: —

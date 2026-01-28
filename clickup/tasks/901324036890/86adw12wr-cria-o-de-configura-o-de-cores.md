@@ -1,10 +1,11 @@
 # Criação de configuração de cores
 
-ID: 86adw12wr  
-Status: complete  
-Assignee(s): —  
-Prioridade: —  
-List: Sprint 1 (1/12 - 1/25)  
+ID: 86adw12wr
+Custom ID: DSGN-2
+Status: complete
+Assignee(s): —
+Prioridade: —
+List: Sprint 1 (1/12 - 1/25)
 
 Datas:
 - Criado: 2025-12-11

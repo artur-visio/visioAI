@@ -1,10 +1,11 @@
 # Cadastro de lista no findface por Organization - P
 
-ID: 86aeg6en5  
-Status: complete  
-Assignee(s): Esau Bandeira  
-Prioridade: high  
-List: Sprint 4 (1/12 - 1/25)  
+ID: 86aeg6en5
+Custom ID: TECH-158
+Status: complete
+Assignee(s): Esau Bandeira
+Prioridade: high
+List: Sprint 4 (1/12 - 1/25)
 
 Datas:
 - Criado: 2026-01-13
@@ -12,22 +13,22 @@ Datas:
 - Due: —
 
 ## Descrição
-Objetivo
+### Objetivo
 Precisamos casar a CMS com a findface, garantindo que inserções, atualiações e deleções na entidade de Organization replique fazendo o que for necessário na findface
- 
-Vamos usar os mesmos endpoints de Organization nossa usando os endpoints existentes  
-Como
+
+Vamos usar os mesmos endpoints de Organization nossa usando os endpoints existentes [https://api-dev.visio.io/cms/docs#tag/organizations](https://api-dev.visio.io/cms/docs#tag/organizations)
+### Como
 Vamos fazer diretamente na CMS api, sem nenhum serviço adicional para isso
-vamos fazer via http service 
+vamos fazer via http service
 Garantir que tudo seja uma transaction, para proteger contra inconsistência
 Vamos utilizar o ID da Organization da CMS api como nome da Lista no Findface
- 
-Listas
+
+**Listas**
 A premissa será 1 lista por organizationID, o nome da lista será o ID da Organização
- 
-Documentação
-[1] Acessar a documentação da nossa maquina, ver o IP
+
+### Documentação
+\[1\] Acessar a documentação da nossa maquina, ver o IP
 
 ## Custom Fields
-- Módulo/Épico: —
 - Versão: 0
+- Módulo/Épico: —

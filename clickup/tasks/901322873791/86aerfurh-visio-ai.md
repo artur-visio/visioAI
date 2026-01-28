@@ -1,10 +1,11 @@
 # Visio AI
 
-ID: 86aerfurh  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86aerfurh
+Custom ID: TECH-187
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-23
@@ -12,8 +13,8 @@ Datas:
 - Due: —
 
 ## Descrição
-Permitir buscar as gravações ou criar um alerta para ser notificado a partir das buscas no aovivo
+*   Permitir buscar as gravações ou criar um alerta para ser notificado a partir das buscas no aovivo
 
 ## Custom Fields
-- Módulo/Épico: 4
 - Versão: 0
+- Módulo/Épico: 4

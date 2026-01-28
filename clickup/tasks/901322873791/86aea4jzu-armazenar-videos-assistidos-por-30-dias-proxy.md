@@ -1,10 +1,11 @@
 # Armazenar videos assistidos por 30 dias - Proxy
 
-ID: 86aea4jzu  
-Status: to do  
-Assignee(s): —  
-Prioridade: —  
-List: Backlog  
+ID: 86aea4jzu
+Custom ID: TECH-129
+Status: to do
+Assignee(s): —
+Prioridade: —
+List: Backlog
 
 Datas:
 - Criado: 2026-01-06
@@ -15,5 +16,5 @@ Datas:
 —
 
 ## Custom Fields
-- Módulo/Épico: 7
 - Versão: 3
+- Módulo/Épico: 7

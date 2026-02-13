@@ -9,7 +9,7 @@ List: Backlog
 
 Datas:
 - Criado: 2026-01-05
-- Atualizado: 2026-01-23
+- Atualizado: 2026-02-04
 - Due: —
 
 ## Descrição

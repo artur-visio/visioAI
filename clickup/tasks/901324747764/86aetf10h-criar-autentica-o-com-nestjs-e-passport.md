@@ -2,14 +2,14 @@
 
 ID: 86aetf10h
 Custom ID: TECH-199
-Status: in progress
+Status: complete
 Assignee(s): Hilton Junior
 Prioridade: high
 List: Sprint 5 (1/26 - 2/8)
 
 Datas:
 - Criado: 2026-01-24
-- Atualizado: 2026-01-27
+- Atualizado: 2026-01-29
 - Due: —
 
 ## Descrição

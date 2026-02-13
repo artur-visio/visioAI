@@ -9,7 +9,7 @@ List: Backlog
 
 Datas:
 - Criado: 2026-01-23
-- Atualizado: 2026-01-23
+- Atualizado: 2026-02-01
 - Due: —
 
 ## Descrição
@@ -18,4 +18,4 @@ Datas:
 
 ## Custom Fields
 - Versão: 0
-- Módulo/Épico: 6
+- Módulo/Épico: 3

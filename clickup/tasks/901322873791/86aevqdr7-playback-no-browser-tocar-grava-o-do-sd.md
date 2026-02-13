@@ -9,7 +9,7 @@ List: Backlog
 
 Datas:
 - Criado: 2026-01-27
-- Atualizado: 2026-01-27
+- Atualizado: 2026-02-04
 - Due: —
 
 ## Descrição
@@ -49,4 +49,4 @@ Isso te dá uma visão por dia e evita search pesado toda hora.
 
 ## Custom Fields
 - Versão: 0
-- Módulo/Épico: —
+- Módulo/Épico: 2

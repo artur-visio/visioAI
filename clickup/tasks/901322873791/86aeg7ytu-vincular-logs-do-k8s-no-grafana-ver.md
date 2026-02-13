@@ -2,14 +2,14 @@
 
 ID: 86aeg7ytu
 Custom ID: TECH-159
-Status: to do
+Status: complete
 Assignee(s): —
 Prioridade: —
 List: Backlog
 
 Datas:
 - Criado: 2026-01-13
-- Atualizado: 2026-01-28
+- Atualizado: 2026-02-04
 - Due: —
 
 ## Descrição

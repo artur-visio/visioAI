@@ -2,14 +2,14 @@
 
 ID: 86aef4jc2
 Custom ID: TECH-141
-Status: in progress
+Status: complete
 Assignee(s): Felipe Nogueira Gaudio
 Prioridade: —
 List: Sprint 5 (1/26 - 2/8)
 
 Datas:
 - Criado: 2026-01-12
-- Atualizado: 2026-01-28
+- Atualizado: 2026-01-30
 - Due: —
 
 ## Descrição

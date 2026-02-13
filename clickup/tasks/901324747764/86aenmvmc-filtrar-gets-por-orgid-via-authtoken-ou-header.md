@@ -2,14 +2,14 @@
 
 ID: 86aenmvmc
 Custom ID: TECH-175
-Status: on hold
+Status: complete
 Assignee(s): Charbel Szymanski
 Prioridade: —
 List: Sprint 5 (1/26 - 2/8)
 
 Datas:
 - Criado: 2026-01-20
-- Atualizado: 2026-01-27
+- Atualizado: 2026-02-02
 - Due: —
 
 ## Descrição

@@ -10,6 +10,8 @@ repos/
 .env.*
 *.key
 *.pem
+*.conf
+.mcp.json
 
 # ===============================
 # Node / scripts
@@ -35,3 +37,18 @@ yarn-error.log*
 # ===============================
 tmp/
 .cache/
+
+# ===============================
+# ClickUp sync (cache local, mutável)
+# ===============================
+clickup/
+
+# ===============================
+# Docs gerados / temporários
+# ===============================
+docs/
+
+# ===============================
+# Claude Code — configuração local
+# ===============================
+.claude/settings.local.json

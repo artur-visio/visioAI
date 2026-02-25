@@ -242,11 +242,17 @@ Se não, escrever "Nenhum alerta novo — fluxo coberto pelos alertas existentes
    ```
    Guardar o `id` retornado para montar o link: `https://app.clickup.com/90132794332/v/dc/2ky5ajyw-1133/{page_id}`
 
-2. **Atualizar a task description** com link + resumo:
+2. **Atualizar a task description** com link + resumo, e **adicionar tag `refine-ai`**:
    ```
    mcp__clickup__clickup_update_task
      task_id: "TECH-XXX"
      markdown_description: {template da task description com link do doc}
+   ```
+   Em seguida:
+   ```
+   mcp__clickup__clickup_add_tag_to_task
+     task_id: "TECH-XXX"
+     tag_name: "refine-ai"
    ```
 
 3. **Criar cada subtask** (com description + tags em 1 chamada):

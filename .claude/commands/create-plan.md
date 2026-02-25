@@ -153,6 +153,30 @@ Só iniciar esta fase após o usuário validar a Fase 0.
 ## Verificação
 {Lista numerada de critérios de aceite globais.}
 1. {critério}
+
+## Observabilidade
+
+### Métricas
+{Identificar quais métricas Prometheus devem ser criadas ou atualizadas com esta feature.
+Considerar: novos endpoints HTTP, chamadas a APIs externas, workflows Temporal, conexões de streaming.
+Se a feature não impacta observabilidade, escrever "Nenhuma métrica nova necessária — funcionalidade coberta pelas métricas existentes." com justificativa.}
+
+| Nome | Tipo | Labels | Justificativa |
+|------|------|--------|---------------|
+| {metric_name} | Counter/Histogram/Gauge | {labels} | {por que precisa existir} |
+
+### Alertas
+{Se a feature introduz um novo fluxo crítico ou ponto de falha, definir alertas.
+Se não, escrever "Nenhum alerta novo — fluxo coberto pelos alertas existentes."}
+
+| Nome | Condição | Severidade | Dashboard |
+|------|----------|-----------|-----------|
+| {alert_name} | {expr} for {duration} | critical/warning | {dashboard afetado} |
+
+### Impacto em dashboards existentes
+{Listar quais dashboards Grafana precisam de painel novo ou atualização. Dashboards atuais: Facial, LPR, Streaming.}
+* {qual dashboard precisa de painel novo ou atualização}
+* Nenhum (se não impacta)
 ```
 
 ### Template da Task Description (o que vai na task principal)
@@ -169,6 +193,9 @@ Só iniciar esta fase após o usuário validar a Fase 0.
 
 ### Decisões técnicas
 {Top 5 bullets mais importantes.}
+
+### Observabilidade
+{Resumo: métricas novas, alertas, dashboards impactados. Se nenhum, justificar.}
 
 ### Subtasks
 | # | Nome | Tags |

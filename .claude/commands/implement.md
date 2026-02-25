@@ -68,6 +68,8 @@ Task tool (Explore, background: true)
 - Há nova migration? → `db-migration` agent necessário
 - Há mudança em `infra-registry/apps/`? → `app-deploy` agent necessário
 - Há mudança em `infra-registry/infra/`? → `terraform` agent necessário (checkpoint extra)
+- O plano tem seção Observabilidade com métricas/alertas? → `monitoring` agent necessário
+- Mesmo sem seção, há novos endpoints, APIs externas ou workflows? → `monitoring` agent necessário (regras automáticas)
 
 ### Resultado esperado:
 
@@ -137,7 +139,8 @@ git checkout -b feature/$ARGUMENTS-{slug}
 2. `db-migration` — após cms-api (precisa da entity atualizada)
 3. `api-contract` — após cms-api + db-migration (precisa dos DTOs atualizados)
 4. `frontend` — após api-contract (precisa dos hooks regenerados)
-5. `app-deploy` e `terraform` — por último, se necessários
+5. `monitoring` — após todos os specialists de código (analisa o diff + seção Observabilidade do plano)
+6. `app-deploy` e `terraform` — por último, se necessários
 
 **Cada agent:**
 - Recebe no prompt: plano técnico das suas subtasks + resultado do Impact Analyzer para seus arquivos
@@ -308,6 +311,51 @@ prompt:
   Retornar: arquivos modificados.
 ```
 
+#### `monitoring` agent (Tier 2 — cross-cutting)
+```
+subagent_type: general-purpose
+prompt:
+  Contexto: você é o monitoring specialist. Seu papel é garantir que toda
+  feature nova tenha instrumentação adequada de métricas Prometheus.
+  Branch atual: feature/$ARGUMENTS-{slug}
+
+  Você tem 2 fontes de input:
+  1. Seção "Observabilidade" do plano técnico (se existir): {conteúdo}
+  2. Diff dos specialists: {lista de arquivos modificados/criados}
+
+  O que fazer:
+
+  SE o plano tem seção Observabilidade:
+  - Implementar exatamente as métricas, alertas e impactos em dashboards listados
+  - Adicionar métricas nos arquivos de metrics.ts (ou metrics.go) do serviço correto
+  - Instrumentar os pontos do código indicados no plano
+  - Criar/atualizar PrometheusRules se o plano define alertas novos
+
+  SE o plano NÃO tem seção Observabilidade (ou diz "nenhuma"):
+  - Aplicar regras automáticas ao diff dos specialists:
+    * Novo endpoint HTTP → request_duration_seconds histogram + response_status_total counter
+    * Nova chamada a API externa → api_call_duration_seconds histogram
+    * Novo workflow Temporal → workflow_started_total counter + completion_total counter com tipos
+    * Novo fluxo de conexão → active_connections gauge
+  - Se nenhuma regra se aplica, retornar "Nenhuma instrumentação necessária" com justificativa
+
+  Regras de escopo:
+  - PODE modificar arquivos de métricas em QUALQUER serviço (metrics.ts, metrics.go)
+  - PODE instrumentar código dos specialists (adicionar .inc(), .observe(), .startTimer())
+  - PODE criar/modificar ServiceMonitors e PrometheusRules em infra-registry/
+  - NÃO pode alterar lógica de negócio — apenas adicionar instrumentação
+  - NÃO pode alterar assinatura de funções ou tipos de retorno
+
+  Serviços e seus arquivos de métricas:
+  - camera-webhook: camera-webhook/src/metrics.ts (prom-client)
+  - temporal-worker: temporal-worker/src/metrics.ts (prom-client)
+  - streaming: streaming/internal/metrics/metrics.go (prometheus/client_golang)
+  - cms-api: não tem métricas ainda — se necessário, criar cms-api/src/metrics/ e registrar no módulo
+
+  Ao terminar: commit com mensagem "$ARGUMENTS: instrumentação de métricas"
+  Retornar: lista de métricas adicionadas + arquivos modificados + justificativa.
+```
+
 #### `app-deploy` agent (se necessário)
 ```
 subagent_type: general-purpose
@@ -411,6 +459,9 @@ prompt:
   - Nenhum secret hardcodado?
   - Padrões do projeto respeitados (andWhere, @IsOptional, Zod schema separado)?
   - Nenhum arquivo fora do escopo de cada agent foi modificado?
+  - Observabilidade: monitoring agent instrumentou as métricas definidas no plano?
+  - Se o plano não tinha seção Observabilidade: as regras automáticas foram aplicadas
+    corretamente (novos endpoints têm duration+status, novas APIs externas têm call_duration)?
 
   Retornar:
   - APROVADO: tudo ok
@@ -525,6 +576,7 @@ prompt:
 | `streaming` | `repos/plataforma/streaming/` | Go, MediaMTX | sim |
 | `temporal-worker` | `repos/plataforma/temporal-worker/` | TypeScript, Temporal | sim |
 | `camera-webhook` | `repos/plataforma/camera-webhook/` | TypeScript | sim |
+| `monitoring` | cross-cutting (metrics.ts/go + infra-registry/) | prom-client, Prometheus | sim |
 | `app-deploy` | `infra-registry/apps/` | Kustomize, Helm | sim |
 | `terraform` | `infra-registry/infra/` | Terraform | só plan, nunca apply |
 
@@ -533,6 +585,8 @@ prompt:
 ## Regras gerais
 
 - **Isolamento por escopo**: cada agent só modifica arquivos do seu diretório — nunca cruzar limites
+- **Exceção: monitoring agent**: pode tocar arquivos de métricas em qualquer serviço, mas NÃO pode alterar lógica de negócio
+- **Monitoring é default-on**: o monitoring agent SEMPRE roda, a menos que o plano diga explicitamente "Nenhuma métrica nova necessária" com justificativa aceita. Na dúvida, rodar e deixar o agent decidir se há algo a instrumentar.
 - **Terraform**: nunca `apply` automático — retornar `plan` para aprovação humana
 - **db-migration**: nunca `migration:run` em produção — só em dev para validação local
 - **Secrets**: nunca hardcodar — referências a K8s Secrets ou Key Vault

@@ -43,7 +43,7 @@ Internet ──► Ingress (vpn.visio.io) ──► Web UI (:8000)
 | Allowed IPs | `10.10.0.0/16`, `10.0.0.0/16` |
 | WireGuard Port | UDP 51820 (LoadBalancer) |
 | Web UI | https://vpn.visio.io |
-| LoadBalancer IP | `20.36.245.75` |
+| LoadBalancer IP | `20.41.55.223` |
 
 ## Impactos
 

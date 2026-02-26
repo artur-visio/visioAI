@@ -7,7 +7,7 @@
 1. Acesse https://vpn.visio.io
 2. Login: `admin` / `visio-vpn-dev-2024`
 3. "Add Device" → nome do device → baixar `.conf`
-4. Editar arquivo e corrigir Endpoint para: `20.36.245.75:51820`
+4. Editar arquivo e corrigir Endpoint para: `20.41.55.223:51820`
 
 ### 2. Conectar
 
@@ -48,9 +48,9 @@ psql -h 10.10.16.4 -U pgadmin -d appdb
 
 ### VPN não conecta
 
-1. Verificar se Endpoint está correto: `20.36.245.75:51820`
+1. Verificar se Endpoint está correto: `20.41.55.223:51820`
 2. Verificar se túnel está ativo: `sudo wg show`
-3. Testar porta UDP: `nc -zvu 20.36.245.75 51820`
+3. Testar porta UDP: `nc -zvu 20.41.55.223 51820`
 
 ### Banco não conecta
 

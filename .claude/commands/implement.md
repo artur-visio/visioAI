@@ -7,6 +7,12 @@ argument-hint: [TECH-XXX]
 
 Você vai implementar a task **$ARGUMENTS** usando um pipeline de agents especializados. O fluxo tem **2 checkpoints obrigatórios** — tudo entre eles é autônomo.
 
+### Regra de autonomia
+
+**Entre checkpoints, o pipeline é 100% autônomo.** Não fazer perguntas intermediárias, não pedir confirmação de passos, não mostrar resultados parciais esperando aprovação. Executar todas as fases sequencialmente até o próximo checkpoint. O único motivo para parar entre checkpoints é:
+- Erro bloqueante (build falhou, divergência crítica no código)
+- Ação destrutiva em infra (terraform apply, migration:run em prod)
+
 ## Configuração
 
 - **Monorepo**: `repos/plataforma/`
@@ -34,9 +40,9 @@ Você vai implementar a task **$ARGUMENTS** usando um pipeline de agents especia
    - Buscar em `clickup/docs/documenta-o/planos-t-cnicos/`
    - Se o doc não estiver sincronizado localmente, rodar sync: `node repos/clickup-sync/sync-docs.js`
 
-3. Se **não existir plano técnico**: parar e orientar o usuário a rodar `/create-plan $ARGUMENTS` primeiro.
+3. Se **não existir plano técnico nem description detalhada**: parar e orientar o usuário a rodar `/create-plan $ARGUMENTS` primeiro.
 
-4. Se **existir plano técnico**: carregar e estruturar internamente:
+4. Se **existir plano técnico** (doc page ou description detalhada da task com causa raiz, solução e critérios de aceite): carregar e estruturar internamente:
    - Lista de arquivos a modificar (com caminho completo)
    - Subtasks com seus escopos
    - Decisões técnicas
@@ -472,6 +478,149 @@ Se retornar PROBLEMAS: corrigir (relançar o specialist responsável se necessá
 
 ---
 
+## FASE 5 — QA
+
+**Objetivo**: O QA agent prepara o ambiente, roda todos os testes automatizados e funcionais possíveis, e só no final pede o teste visual/manual ao usuário.
+
+### Credenciais de teste
+
+```
+Email: admin@visio.io
+Senha: visio1234
+```
+
+Usar essas credenciais para autenticar em APIs e na interface quando necessário.
+
+### Ambiente de teste
+
+Todos os testes de QA são feitos **localmente** — a mudança ainda não está deployada.
+
+- PostgreSQL: `localhost:5433` (via docker compose do cms-api)
+- API: `http://localhost:3000/cms`
+- Frontend: `http://localhost:3001` (porta 3001 porque a API usa 3000)
+- Streaming: depende do docker compose local
+
+**IMPORTANTE**: O frontend depende da API para funcionar (login, dados). A API depende do PostgreSQL. Sempre subir toda a stack necessária, mesmo que apenas um serviço tenha sido modificado.
+
+### Passo 1: Preparar o ambiente
+
+**REGRA FUNDAMENTAL**: Subir **TODOS** os serviços que o usuário precisa para testar, não apenas os que foram modificados. O teste é end-to-end — se o frontend precisa da API para login, a API precisa estar rodando mesmo que não tenha sido modificada.
+
+**Mapa de dependências para teste local:**
+- **Frontend** depende de: cms-api (auth, dados), streaming (vídeo)
+- **cms-api** depende de: PostgreSQL (DB)
+- **streaming** depende de: cms-api (validação de tokens), câmeras (RTSP)
+- **Design System** → precisa ser buildado e linkado no frontend
+
+**Verificar `.env.local` do frontend** — confirmar que `NEXT_PUBLIC_CMS_API_URL` aponta para `http://localhost:3000`. Se o frontend roda na mesma porta, ajustar uma das portas (ex: frontend na 3001 com `next dev -p 3001`).
+
+**Sequência de setup:**
+
+1. **PostgreSQL** (sempre necessário para a API):
+   ```
+   cd cms-api && npm run compose:dev:up
+   ```
+
+2. **cms-api** (sempre necessário para o frontend):
+   ```
+   cd cms-api && npm run migration:run && npm run start:dev
+   ```
+   Verificar que inicia sem erros e que o login funciona: `curl -X POST http://localhost:3000/cms/auth/login`
+
+3. **Design System** (se modificado):
+   - Instalar dependências: `cd visio-design-system && pnpm install`
+   - Build: `pnpm build`
+   - Copiar dist para `visio-frontend/node_modules/.pnpm/@visio-io+design-system@*/node_modules/@visio-io/design-system/dist/`
+   - Limpar cache do Next.js: `rm -rf visio-frontend/.next`
+
+4. **Frontend**:
+   ```
+   cd visio-frontend && npm run dev -p 3001
+   ```
+   (porta 3001 porque a API já usa 3000)
+
+5. **Streaming** (se necessário para o teste — ex: mudanças em vídeo):
+   ```
+   cd streaming && docker compose --profile dev-build --profile engine-mediamtx up
+   ```
+
+6. **Validar que tudo está conectado**:
+   - Testar login na API: `curl -s -X POST http://localhost:3000/cms/auth/login -H 'Content-Type: application/json' -d '{"email":"admin@visio.io","password":"visio1234"}'`
+   - Acessar frontend no browser: `http://localhost:3001`
+
+### Passo 2: Testes automatizados (build/types/unit)
+
+Rodar em paralelo por serviço:
+
+- Build de todos os serviços afetados
+- Type-check (`tsc --noEmit`)
+- Testes unitários (`npm test`, `go test ./...`)
+- Se encontrar erros, verificar se são **pré-existentes** (comparar com `main`) vs **introduzidos pelo fix**
+
+### Passo 3: Testes funcionais (API/Streaming/Interface)
+
+O QA agent deve **testar ativamente** as mudanças, não apenas buildar:
+
+#### Se cms-api foi modificado:
+- Autenticar na API via `POST /auth/login` com as credenciais de teste
+- Guardar o token JWT retornado
+- Testar os endpoints afetados pela mudança:
+  - `curl` com os parâmetros corretos
+  - Verificar status code, formato da resposta, campos novos/alterados
+  - Testar edge cases (campos nulos, filtros vazios, paginação)
+- Se migration nova: verificar que o schema do DB reflete as mudanças
+
+#### Se streaming foi modificado:
+- Verificar que o serviço inicia sem erros
+- Se houve mudança em endpoints WHEP/HLS: testar a negociação
+  - `curl` no endpoint WHEP para verificar SDP response
+  - Verificar headers e status codes
+- Se houve mudança em autenticação/tokens: testar com token válido e inválido
+
+#### Se frontend/design-system foi modificado:
+- Verificar que o build passa
+- Se possível, acessar a interface via URL local e verificar que a página carrega
+- Limitação: testes visuais (renderização, animações, transições) ficam para o teste manual do usuário
+
+#### Se infra foi modificada:
+- Verificar manifests Kubernetes com `kubectl diff` (dry-run)
+- Terraform: apenas `plan`, nunca `apply`
+
+### Passo 4: Relatório + Teste manual do usuário
+
+Apresentar resultado consolidado e pedir apenas o teste visual/manual:
+
+```
+## QA — $ARGUMENTS
+
+**Testes automatizados:**
+- Build: ✅ / ❌ (pré-existente)
+- Types: ✅ / ❌ (pré-existente)
+- Unit tests: ✅ / N/A
+
+**Testes funcionais:**
+- {endpoint/serviço testado}: ✅ {resumo do que foi verificado}
+- ...
+
+**Ambiente pronto:**
+- {serviço} rodando em {url}
+
+**Teste manual (o que só o usuário pode validar):**
+1. {cenário visual/UX}: {resultado esperado}
+2. ...
+
+O ambiente está rodando. Teste os cenários acima e me diga se passou.
+```
+
+**PARAR e aguardar feedback do usuário.**
+
+### Passo 5: Reagir ao feedback
+
+- Se o usuário reportar problema: analisar, corrigir, rodar testes novamente, voltar ao QA
+- Se o usuário confirmar que passou: avançar para Checkpoint 2
+
+---
+
 ## CHECKPOINT 2 — PR PARA DEV
 
 Apresentar ao usuário:
@@ -500,7 +649,7 @@ Abrir PR para dev?
 
 ---
 
-## FASE 5 — PR GENERATOR
+## FASE 6 — PR GENERATOR
 
 Após aprovação do Checkpoint 2:
 
@@ -594,3 +743,4 @@ prompt:
 - **Divergência plano vs código**: sinalizar no Checkpoint 1, não assumir
 - **Teste falhou**: parar pipeline, apresentar erro, aguardar instrução
 - **Commits**: cada agent commita suas próprias mudanças com mensagem descritiva
+- **Cleanup de worktrees**: ao finalizar o pipeline (após PR criado), verificar `git worktree list` e remover worktrees órfãos em `/private/tmp/` com `git worktree remove <path>`. Worktrees stale aparecem como branches fantasma no VS Code.

@@ -100,6 +100,12 @@ Sempre que possível, incluir no topo:
 - Priorize clareza > volume de texto
 - Evite complexidade desnecessária: proponha opções simples antes de sofisticadas
 
+## Gestão de sessão e consumo
+
+- **Ao completar uma entrega** (plano publicado no ClickUp, task implementada, decisão documentada): sugerir `> 💡 Entrega concluída — considere `/clear` para resetar o contexto e reduzir consumo de tokens na próxima tarefa.`
+- **Pesquisa de código**: SEMPRE usar subagent `Explore` para ler arquivos do codebase — nunca ler diretamente na sessão principal quando o escopo for > 2 arquivos. O Explore isola o contexto e descarta ao terminar.
+- **Subagents**: passar escopo restrito de arquivos no prompt. Evitar "explore o módulo X" — preferir "leia estes 3 arquivos e retorne Y".
+
 ## Uso de ClickUp e Repositórios
 
 - Use `clickup/` como fonte de verdade para:

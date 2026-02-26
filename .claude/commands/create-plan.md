@@ -23,11 +23,17 @@ Você vai criar um plano técnico para a task **$ARGUMENTS** seguindo um fluxo d
 
 ### O que fazer:
 
-1. Buscar a task no ClickUp via MCP:
-   - Usar `mcp__clickup__clickup_get_task` com o Custom ID (ex: TECH-178)
+1. **Se $ARGUMENTS estiver vazio ou não for um ID de task**:
+   - Usar o contexto da conversa para inferir o que o usuário quer construir
+   - Propor um nome de task e perguntar em qual lista criar (Backlog Tech = `901322873791`)
+   - Criar a task no ClickUp via `mcp__clickup__clickup_create_task` com nome + list_id, sem description ainda
+   - Usar o ID retornado como task base para o restante do fluxo
+
+2. **Se $ARGUMENTS for um Custom ID** (ex: TECH-178):
+   - Usar `mcp__clickup__clickup_get_task` com o Custom ID
    - Se tiver subtasks, usar `subtasks: true`
 
-2. Ler o código relevante nos `repos/plataforma/` — entities, services, controllers, frontend pages mencionados ou relacionados à task.
+3. Ler o código relevante nos `repos/plataforma/` — entities, services, controllers, frontend pages mencionados ou relacionados à task.
 
 3. Verificar se existe documentação relevante em:
    - `clickup/docs/documenta-o/` (produto, arquitetura)
@@ -77,16 +83,51 @@ Você vai criar um plano técnico para a task **$ARGUMENTS** seguindo um fluxo d
 
 Só iniciar esta fase após o usuário validar a Fase 0.
 
+### Avaliação de complexidade
+
+Antes de elaborar, avaliar se a task precisa de plano completo ou apenas da task description:
+
+- **Task simples** (bug fix pontual, mudança de 1-2 arquivos, sem decisão arquitetural):
+  - NÃO criar doc page no ClickUp Docs
+  - Apenas elaborar a **task description** com objetivo, causa raiz, solução e critérios de aceite
+  - Se a task tiver apenas 1 subtask, NÃO criar subtask — o conteúdo vai direto na task principal
+
+- **Task complexa** (feature nova, mudança em múltiplos serviços, decisões arquiteturais):
+  - Criar doc page completo + task description + subtasks (fluxo padrão)
+
 ### O que fazer:
 
-1. Elaborar o plano completo seguindo o **Template do Doc** (abaixo).
-2. Elaborar a **description da task** no formato padrão (abaixo).
-3. Elaborar cada **subtask** com nome, tags e descrição detalhada (abaixo).
-4. Mostrar tudo inline para o usuário revisar, separando claramente:
-   - `📄 DOC PAGE` — o plano completo que vai no ClickUp Docs
+1. Avaliar complexidade conforme acima.
+2. Se **task simples**: elaborar apenas a task description (Template Simples abaixo).
+3. Se **task complexa**: elaborar o plano completo seguindo o **Template do Doc** (abaixo).
+4. Elaborar a **description da task** no formato padrão (abaixo).
+5. Se houver mais de 1 subtask, elaborar cada **subtask** com nome, tags e descrição detalhada (abaixo).
+6. Mostrar tudo inline para o usuário revisar, separando claramente:
+   - (se complexa) `📄 DOC PAGE` — o plano completo que vai no ClickUp Docs
    - `📋 TASK DESCRIPTION` — o resumo que vai na task principal
-   - `📌 SUBTASKS` — cada subtask com nome, tags e descrição
-5. **PARAR e aguardar aprovação.** Perguntar: "Quer ajustar algo ou posso publicar no ClickUp?"
+   - (se >1 subtask) `📌 SUBTASKS` — cada subtask com nome, tags e descrição
+7. **PARAR e aguardar aprovação.** Perguntar: "Quer ajustar algo ou posso publicar no ClickUp?"
+
+### Template Simples (task description para bugs/fixes pontuais)
+
+```markdown
+### Bug
+{Descrição do problema visível para o usuário.}
+
+### Causa raiz
+{Explicação técnica do que causa o problema, com referência a arquivo e linha.}
+
+### Solução
+{O que mudar, com detalhamento técnico suficiente para implementar.}
+
+### Arquivos
+| Arquivo | Mudança |
+|---------|---------|
+| `{caminho}` | {o que muda} |
+
+### Critérios de aceite
+1. {dado X, espera-se Y}
+```
 
 ### Template do Doc (ClickUp Docs → Planos Técnicos)
 
@@ -230,6 +271,29 @@ Se não, escrever "Nenhum alerta novo — fluxo coberto pelos alertas existentes
 **Objetivo**: Criar tudo no ClickUp via MCP. Só executar após aprovação explícita do usuário.
 
 ### O que fazer:
+
+**Se task simples (sem doc page, sem subtasks):**
+
+1. **Criar a task** no ClickUp (se ainda não existe):
+   ```
+   mcp__clickup__clickup_create_task
+     name: "{nome}"
+     list_id: 901322873791
+     markdown_description: {template simples}
+     tags: ["{tag1}"]
+   ```
+   Ou **atualizar a task existente**:
+   ```
+   mcp__clickup__clickup_update_task
+     task_id: "{id}"
+     markdown_description: {template simples}
+   ```
+
+2. **Adicionar tags** relevantes à task.
+
+3. **Mostrar resultado final** com link da task.
+
+**Se task complexa (fluxo completo):**
 
 1. **Criar doc page** no ClickUp Docs sob Planos Técnicos:
    ```

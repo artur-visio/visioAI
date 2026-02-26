@@ -33,18 +33,24 @@ Você vai criar um plano técnico para a task **$ARGUMENTS** seguindo um fluxo d
    - Usar `mcp__clickup__clickup_get_task` com o Custom ID
    - Se tiver subtasks, usar `subtasks: true`
 
-3. Ler o código relevante nos `repos/plataforma/` — entities, services, controllers, frontend pages mencionados ou relacionados à task.
+3. **Ler o código real** (fazer isso ANTES de docs — docs frequentemente desatualizados):
+   - Se o módulo for previsível pelo padrão NestJS: ler diretamente os arquivos, SEM subagent:
+     - `repos/plataforma/cms-api/src/modules/{modulo}/{modulo}.entity.ts`
+     - `repos/plataforma/cms-api/src/modules/{modulo}/{modulo}.service.ts`
+     - `repos/plataforma/cms-api/src/modules/{modulo}/{modulo}.controller.ts`
+   - Usar Grep pontual se precisar localizar um símbolo: `Grep pattern:"NomeClasse" path:"repos/plataforma/"`
+   - **Subagent Explore APENAS** se o módulo for genuinamente desconhecido e uma busca Grep não resolver
 
-3. Verificar se existe documentação relevante em:
-   - `clickup/docs/documenta-o/` (produto, arquitetura)
-   - `decisions/` (decisões tomadas)
-   - `tech/` (padrões técnicos)
+4. Verificar docs apenas se existirem em caminho conhecido (NÃO explorar diretórios inteiros):
+   - `decisions/{arquivo-específico}.md` se já souber o nome
+   - `tech/{arquivo-específico}.md` se já souber o nome
+   - `clickup/docs/documenta-o/` — consultar apenas se houver referência explícita na task
 
-4. Verificar se existe design no Figma:
-   - Buscar nos attachments da task
-   - Buscar nos docs de produto
+5. Verificar se existe design no Figma:
+   - Verificar `attachments` da task já carregada no passo 2 — NÃO fazer nova chamada à API
+   - Se não houver attachment de Figma: declarar "Não encontrado" sem buscar em outros lugares
 
-5. Apresentar ao usuário:
+6. Apresentar ao usuário:
 
    > **Task**: TECH-XXX — {nome}
    > **Módulo/Épico**: {módulo}
@@ -102,11 +108,17 @@ Antes de elaborar, avaliar se a task precisa de plano completo ou apenas da task
 3. Se **task complexa**: elaborar o plano completo seguindo o **Template do Doc** (abaixo).
 4. Elaborar a **description da task** no formato padrão (abaixo).
 5. Se houver mais de 1 subtask, elaborar cada **subtask** com nome, tags e descrição detalhada (abaixo).
-6. Mostrar tudo inline para o usuário revisar, separando claramente:
-   - (se complexa) `📄 DOC PAGE` — o plano completo que vai no ClickUp Docs
-   - `📋 TASK DESCRIPTION` — o resumo que vai na task principal
-   - (se >1 subtask) `📌 SUBTASKS` — cada subtask com nome, tags e descrição
-7. **PARAR e aguardar aprovação.** Perguntar: "Quer ajustar algo ou posso publicar no ClickUp?"
+6. Mostrar **resumo executivo** primeiro:
+   ```
+   📋 RESUMO DO PLANO
+   Abordagem: {1-2 frases}
+   Subtasks: {N} ({lista de nomes em 1 linha cada})
+   Decisões chave: {top 3 bullets}
+   Riscos: {se houver}
+   ```
+   Perguntar: "Quer ver o plano completo (doc page + descrições das subtasks) ou posso publicar direto?"
+
+7. **PARAR.** Só mostrar detalhes completos (`📄 DOC PAGE`, `📋 TASK DESCRIPTION`, `📌 SUBTASKS`) se o usuário pedir ou houver dúvidas. Se usuário aprovar direto → ir para Fase 2.
 
 ### Template Simples (task description para bugs/fixes pontuais)
 
@@ -346,7 +358,7 @@ Se não, escrever "Nenhum alerta novo — fluxo coberto pelos alertas existentes
 - **Scripts para leitura local**: os arquivos em `clickup/` são úteis para consulta rápida sem API calls, mas podem estar desatualizados (sync a cada 30min).
 - **Nomes de subtasks**: limpos e descritivos. SEM prefixos como `[Backend]` ou `[Frontend]`. Usar TAGS para categorizar.
 - **Tags**: usar apenas as disponíveis: `backend`, `frontend`, `design`, `cms-api`, `grafana-prometheus`, `débito`
-- **Figma**: sempre buscar nos docs e attachments da task. Se não existir, declarar explicitamente.
-- **Código**: sempre ler o código real antes de propor mudanças. Não assumir estrutura.
+- **Figma**: verificar apenas nos attachments da task já carregada. NÃO fazer busca adicional em docs. Se não existir, declarar explicitamente.
+- **Código**: ler os arquivos previsíveis pelo padrão NestJS diretamente (Read/Grep). Subagent Explore só se o módulo for genuinamente desconhecido. Não assumir estrutura.
 - **Decisões**: respeitar `decisions/` como fonte de verdade. Se o plano contradiz uma decisão, alertar.
 - **Escopo**: sempre listar "O que NÃO muda" para evitar scope creep.

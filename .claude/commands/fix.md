@@ -1,6 +1,7 @@
 ---
 description: Resolve um bug de forma autônoma — lê contexto, identifica root cause, implementa fix e abre PR
 argument-hint: [TECH-XXX | descrição do bug]
+model: sonnet
 ---
 
 # Fix Bug
@@ -36,17 +37,35 @@ Extrair:
 
 ## FASE 2 — ROOT CAUSE
 
-1. Usar subagent `Explore` para encontrar o código responsável:
-   - Buscar pelo componente/endpoint/função descrita no bug
-   - Ler os arquivos relevantes (máx. 5 arquivos, escopo cirúrgico)
-   - Identificar a causa raiz exata — não apenas o sintoma
+1. **Localizar o código**:
+   - Se o bug descreve endpoint/componente/função específica: usar Grep ou Read para o arquivo predizível
+     ```
+     Ex: "bug no endpoint /auth/login" → grep -r "login" repos/plataforma/cms-api/src/
+     Ex: "bug no FaceGallery component" → Read repos/plataforma/visio-frontend/src/components/FaceGallery.tsx
+     ```
+   - Usar subagent `Explore` APENAS se não conseguir localizar com Grep/Read:
+     ```
+     Task(Explore, model: haiku, prompt:
+       "Localize o arquivo contendo:
+        - Função: {nome_função}
+        - Ou componente: {nome_componente}
+        - Ou endpoint: {método} {caminho}
 
-2. Se o bug envolve dados: usar subagent `db-reader` para consultar o banco sem escrever nada.
+        Retorne: arquivo_path + conteúdo relevante (máx 500 linhas)")
+     ```
 
-3. Declarar internamente antes de agir:
-   - "O bug está em X porque Y"
-   - "O fix correto é Z"
-   - "Impacto da mudança: apenas [arquivo/função], sem efeitos colaterais em A e B"
+2. **Se envolve dados**:
+   - Use `db-reader` com query específica (não exploração):
+     ```
+     Task(db-reader, prompt:
+       "Conectar ao DB {dev|prod}.
+        SELECT * FROM {tabela} WHERE {filtro};
+        Explicar schema e dados relevantes ao bug.")
+     ```
+
+3. **Declarar root cause**:
+   - "Bug está em {arquivo:linha} porque {razão}"
+   - "Fix é: {mudança} — impacta APENAS {arquivo}, sem efeitos colaterais"
 
 ---
 

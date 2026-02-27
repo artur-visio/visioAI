@@ -1,364 +1,173 @@
 ---
 description: Cria plano técnico detalhado para uma task do ClickUp, com validação em 3 fases
 argument-hint: [TECH-XXX]
+model: sonnet
 ---
 
 # Criar Plano Técnico
 
-Você vai criar um plano técnico para a task **$ARGUMENTS** seguindo um fluxo de 3 fases. **Nenhuma ação no ClickUp acontece antes da aprovação explícita do usuário.**
+Criar plano técnico para **$ARGUMENTS** em 3 fases. **Nenhuma ação no ClickUp antes da aprovação explícita.**
 
 ## Configuração
 
-- **MCP ClickUp** (operações de escrita): usar as tools `mcp__clickup__*` para criar/atualizar tasks, subtasks, doc pages e tags
-- **Scripts** (leitura local): `repos/clickup-sync/` para sync local — NÃO usar para escrita
-- Doc "Documentação": ID `2ky5ajyw-1133`
-- Page "Planos Técnicos": ID `2ky5ajyw-5873`
+- **MCP ClickUp**: `mcp__clickup__*` para escrita. Scripts `repos/clickup-sync/` apenas para leitura local.
+- Doc "Documentação": `2ky5ajyw-1133` | Page "Planos Técnicos": `2ky5ajyw-5873`
 - Tags disponíveis: `backend`, `frontend`, `design`, `cms-api`, `grafana-prometheus`, `débito`
+- Backlog Tech list_id: `901322873791`
 
 ---
 
 ## FASE 0 — ENTENDIMENTO
 
-**Objetivo**: Confirmar que você entendeu a task antes de elaborar o plano.
+1. **Se $ARGUMENTS vazio**: inferir do contexto, propor nome, criar task no Backlog Tech
+2. **Se Custom ID** (TECH-XXX): `mcp__clickup__clickup_get_task(task_id, subtasks: true)`
+3. **Ler código real** (ANTES de docs):
+   - Padrão NestJS → ler direto (SEM subagent): `cms-api/src/modules/{mod}/{mod}.{entity|service|controller}.ts`
+   - Grep pontual se precisar localizar símbolo
+   - Subagent Explore APENAS se genuinamente desconhecido
+4. **Docs**: apenas em caminho conhecido (`decisions/`, `tech/`) e se houver referência na task
+5. **Figma**: apenas nos attachments da task já carregada. Se não houver: "Não encontrado"
+6. **Apresentar**:
+   > **Task**: TECH-XXX — {nome} | **Módulo**: {módulo}
+   > **Problema**: {por que precisa existir}
+   > **Objetivo**: {1-2 frases}
+   > **Existe no código**: {arquivos/módulos relevantes}
+   > **Falta**: {o que criar/modificar}
+   > **Figma**: {link ou "Não encontrado"}
+   > **Dependências**: {tasks, infra}
+   > **Subtasks sugeridas**: | # | Nome | Tags |
+   > **Entendi certo?**
 
-### O que fazer:
-
-1. **Se $ARGUMENTS estiver vazio ou não for um ID de task**:
-   - Usar o contexto da conversa para inferir o que o usuário quer construir
-   - Propor um nome de task e perguntar em qual lista criar (Backlog Tech = `901322873791`)
-   - Criar a task no ClickUp via `mcp__clickup__clickup_create_task` com nome + list_id, sem description ainda
-   - Usar o ID retornado como task base para o restante do fluxo
-
-2. **Se $ARGUMENTS for um Custom ID** (ex: TECH-178):
-   - Usar `mcp__clickup__clickup_get_task` com o Custom ID
-   - Se tiver subtasks, usar `subtasks: true`
-
-3. **Ler o código real** (fazer isso ANTES de docs — docs frequentemente desatualizados):
-   - Se o módulo for previsível pelo padrão NestJS: ler diretamente os arquivos, SEM subagent:
-     - `repos/plataforma/cms-api/src/modules/{modulo}/{modulo}.entity.ts`
-     - `repos/plataforma/cms-api/src/modules/{modulo}/{modulo}.service.ts`
-     - `repos/plataforma/cms-api/src/modules/{modulo}/{modulo}.controller.ts`
-   - Usar Grep pontual se precisar localizar um símbolo: `Grep pattern:"NomeClasse" path:"repos/plataforma/"`
-   - **Subagent Explore APENAS** se o módulo for genuinamente desconhecido e uma busca Grep não resolver
-
-4. Verificar docs apenas se existirem em caminho conhecido (NÃO explorar diretórios inteiros):
-   - `decisions/{arquivo-específico}.md` se já souber o nome
-   - `tech/{arquivo-específico}.md` se já souber o nome
-   - `clickup/docs/documenta-o/` — consultar apenas se houver referência explícita na task
-
-5. Verificar se existe design no Figma:
-   - Verificar `attachments` da task já carregada no passo 2 — NÃO fazer nova chamada à API
-   - Se não houver attachment de Figma: declarar "Não encontrado" sem buscar em outros lugares
-
-6. Apresentar ao usuário:
-
-   > **Task**: TECH-XXX — {nome}
-   > **Módulo/Épico**: {módulo}
-   > **Versão**: {versão}
-   >
-   > **Problema**: {por que isso precisa existir}
-   >
-   > **Objetivo**: {o que resolve, em 1-2 frases}
-   >
-   > **O que já existe no código**:
-   > - {listar arquivos/módulos relevantes que já existem}
-   >
-   > **O que falta**:
-   > - {listar o que precisa ser criado/modificado}
-   >
-   > **Figma**: {link se encontrado, ou "Não encontrado — precisa ser criado pelo design"}
-   >
-   > **Dependências**:
-   > - {outras tasks, infra, etc.}
-   >
-   > **Subtasks sugeridas**:
-   > | # | Nome | Tags |
-   > |---|------|------|
-   > | 1 | {nome limpo, sem prefixo} | `{tag}` |
-   > | 2 | ... | ... |
-   >
-   > **Entendi certo? Algo a ajustar?**
-
-6. **PARAR e aguardar validação do usuário.** Não avançar para a Fase 1 sem aprovação.
+**PARAR e aguardar validação.**
 
 ---
 
 ## FASE 1 — RASCUNHO DO PLANO
 
-**Objetivo**: Mostrar o plano completo para revisão, sem tocar no ClickUp.
+### Avaliar complexidade
+- **Simples** (bug, 1-2 arquivos, sem decisão arquitetural): apenas task description (Template Simples). Se 1 subtask: conteúdo direto na task pai.
+- **Complexa** (feature, múltiplos serviços, decisões): doc page + task description + subtasks
 
-Só iniciar esta fase após o usuário validar a Fase 0.
-
-### Avaliação de complexidade
-
-Antes de elaborar, avaliar se a task precisa de plano completo ou apenas da task description:
-
-- **Task simples** (bug fix pontual, mudança de 1-2 arquivos, sem decisão arquitetural):
-  - NÃO criar doc page no ClickUp Docs
-  - Apenas elaborar a **task description** com objetivo, causa raiz, solução e critérios de aceite
-  - Se a task tiver apenas 1 subtask, NÃO criar subtask — o conteúdo vai direto na task principal
-
-- **Task complexa** (feature nova, mudança em múltiplos serviços, decisões arquiteturais):
-  - Criar doc page completo + task description + subtasks (fluxo padrão)
-
-### O que fazer:
-
-1. Avaliar complexidade conforme acima.
-2. Se **task simples**: elaborar apenas a task description (Template Simples abaixo).
-3. Se **task complexa**: elaborar o plano completo seguindo o **Template do Doc** (abaixo).
-4. Elaborar a **description da task** no formato padrão (abaixo).
-5. Se houver mais de 1 subtask, elaborar cada **subtask** com nome, tags e descrição detalhada (abaixo).
-6. Mostrar **resumo executivo** primeiro:
+### O que fazer
+1. Avaliar complexidade
+2. Elaborar com o template adequado (ver abaixo)
+3. Mostrar **resumo executivo** primeiro:
    ```
-   📋 RESUMO DO PLANO
-   Abordagem: {1-2 frases}
-   Subtasks: {N} ({lista de nomes em 1 linha cada})
-   Decisões chave: {top 3 bullets}
-   Riscos: {se houver}
+   RESUMO: Abordagem (1-2 frases) | Subtasks: N | Decisões chave: top 3 | Riscos
    ```
-   Perguntar: "Quer ver o plano completo (doc page + descrições das subtasks) ou posso publicar direto?"
+   Perguntar: "Publicar direto ou quer ver o plano completo?"
+4. **PARAR.** Detalhes completos só se pedido. Se aprovado → Fase 2.
 
-7. **PARAR.** Só mostrar detalhes completos (`📄 DOC PAGE`, `📋 TASK DESCRIPTION`, `📌 SUBTASKS`) se o usuário pedir ou houver dúvidas. Se usuário aprovar direto → ir para Fase 2.
-
-### Template Simples (task description para bugs/fixes pontuais)
+### Template Simples (bugs/fixes)
 
 ```markdown
 ### Bug
-{Descrição do problema visível para o usuário.}
-
+{Problema visível ao usuário}
 ### Causa raiz
-{Explicação técnica do que causa o problema, com referência a arquivo e linha.}
-
+{Técnica: arquivo, linha, razão}
 ### Solução
-{O que mudar, com detalhamento técnico suficiente para implementar.}
-
+{O que mudar — detalhado para implementar}
 ### Arquivos
 | Arquivo | Mudança |
 |---------|---------|
-| `{caminho}` | {o que muda} |
-
 ### Critérios de aceite
-1. {dado X, espera-se Y}
+1. {dado X → espera-se Y}
 ```
 
-### Template do Doc (ClickUp Docs → Planos Técnicos)
+### Template Doc (tasks complexas → ClickUp Docs)
 
 ```markdown
 # TECH-XXX — {título}
-
-* **Task**: TECH-XXX (ID: {id_interno})
-* **Depende de**: TECH-YYY (se houver)
-* **Status do plano**: PROPOSTO
-* **Data**: {YYYY-MM-DD}
-* **Autor**: Claude (Chief of Staff)
+* **Task**: TECH-XXX (ID: {id}) | **Depende de**: {dep} | **Status**: PROPOSTO | **Data**: {date}
 ---
-
 ## Design (Figma)
-{Link para o Figma ou "Não existe tela no Figma — precisa ser criada."}
-{Se existe, notas sobre o que o design cobre vs o que precisa de decisão técnica.}
-
+{Link ou "Não existe — precisa ser criada"}
 ## Contexto
-{Por que isso precisa existir. Qual problema resolve. 2-3 parágrafos.}
-
+{Por que precisa existir. 2-3 parágrafos.}
 ## Decisões
-{Bullet list com cada decisão técnica + racional curto.}
 * **{Decisão}**: {racional}
-
 ## Arquitetura
-{Diagrama ASCII + explicação do fluxo.}
-
+{Diagrama ASCII + explicação do fluxo}
 ## Fases de implementação
-
 ### Fase 1 — {nome}
-{Arquivos, funções, o que muda. Detalhado o suficiente para alguém implementar.}
-
-### Fase N — ...
-
+{Arquivos, funções, mudanças. Detalhado para implementar.}
 ## Subtasks
-
 | # | Nome | Tags | Descrição curta |
-|---|------|------|-----------------|
-| 1 | {nome} | `{tag}` | {1 linha} |
-
-### Subtask 1 — {nome}
-**Tags:** {tag}
-**Arquivos:**
-* `{caminho/arquivo}` (novo ou existente)
-**O que fazer:**
-* {ação específica}
-**Critérios de aceite:**
-* {dado X, espera-se Y}
-
-### Subtask N — ...
-
+### Subtask N — {nome}
+**Tags:** {tag} | **Arquivos:** `{path}` (novo/existente)
+**O que fazer:** {ações específicas}
+**Critérios de aceite:** {dado X → espera-se Y}
 ## Arquivos a modificar
-
 | Arquivo | Mudança |
-|---------|---------|
-| `{caminho}` | {o que muda} |
-
 ## O que NÃO muda
-{Deixar explícito o que fica igual para evitar escopo creep.}
-
+{Explícito para evitar scope creep}
 ## Pré-requisitos
-{Dependências externas, outras tasks, infra.}
-
+{Dependências externas}
 ## Verificação
-{Lista numerada de critérios de aceite globais.}
-1. {critério}
-
+1. {critério de aceite global}
 ## Observabilidade
-
 ### Métricas
-{Identificar quais métricas Prometheus devem ser criadas ou atualizadas com esta feature.
-Considerar: novos endpoints HTTP, chamadas a APIs externas, workflows Temporal, conexões de streaming.
-Se a feature não impacta observabilidade, escrever "Nenhuma métrica nova necessária — funcionalidade coberta pelas métricas existentes." com justificativa.}
-
+{Novos endpoints HTTP, APIs externas, workflows Temporal, streaming → métricas. Se nenhuma: justificar.}
 | Nome | Tipo | Labels | Justificativa |
-|------|------|--------|---------------|
-| {metric_name} | Counter/Histogram/Gauge | {labels} | {por que precisa existir} |
-
 ### Alertas
-{Se a feature introduz um novo fluxo crítico ou ponto de falha, definir alertas.
-Se não, escrever "Nenhum alerta novo — fluxo coberto pelos alertas existentes."}
-
+{Novo fluxo crítico → alertas. Senão: justificar.}
 | Nome | Condição | Severidade | Dashboard |
-|------|----------|-----------|-----------|
-| {alert_name} | {expr} for {duration} | critical/warning | {dashboard afetado} |
-
-### Impacto em dashboards existentes
-{Listar quais dashboards Grafana precisam de painel novo ou atualização. Dashboards atuais: Facial, LPR, Streaming.}
-* {qual dashboard precisa de painel novo ou atualização}
-* Nenhum (se não impacta)
+### Dashboards
+{Impacto em Facial, LPR, Streaming. Ou "Nenhum."}
 ```
 
-### Template da Task Description (o que vai na task principal)
+### Template Task Description
 
 ```markdown
-> **Plano técnico completo**: [TECH-XXX — {título}]({link_doc}) (ClickUp Docs → Planos Técnicos)
-> **Figma**: {link ou "Não existe — precisa ser criado pelo design"}
-
+> **Plano**: [TECH-XXX — {título}]({link_doc}) | **Figma**: {link ou "N/A"}
 ### Objetivo
-{1-2 frases.}
-
+{1-2 frases}
 ### Solução
-{Resumo do approach + fluxo numerado, 4-6 itens.}
-
+{Approach + fluxo numerado, 4-6 itens}
 ### Decisões técnicas
-{Top 5 bullets mais importantes.}
-
+{Top 5 bullets}
 ### Observabilidade
-{Resumo: métricas novas, alertas, dashboards impactados. Se nenhum, justificar.}
-
+{Resumo: métricas, alertas, dashboards. Se nenhum: justificar.}
 ### Subtasks
 | # | Nome | Tags |
-|---|------|------|
-| 1 | {nome} | `{tag}` |
 ```
 
-### Template das Subtasks
+### Template Subtask
 
 ```markdown
 ### Objetivo
-{1-2 frases do que esta subtask entrega.}
-
+{1-2 frases}
 ### Referências
-* **Plano técnico**: [TECH-XXX — {título}]({link_doc})
-* **Figma**: {link ou "N/A"}
-
+* **Plano**: [TECH-XXX]({link_doc}) | **Figma**: {link ou "N/A"}
 ### O que fazer
-* {ação específica com arquivo e função}
-
+* {ação com arquivo e função}
 ### Arquivos
-* `{caminho}` ({novo ou existente})
-
+* `{path}` (novo/existente)
 ### Critérios de aceite
-* {dado X, espera-se Y}
+* {dado X → espera-se Y}
 ```
 
 ---
 
 ## FASE 2 — PUBLICAR
 
-**Objetivo**: Criar tudo no ClickUp via MCP. Só executar após aprovação explícita do usuário.
+Só após aprovação explícita.
 
-### O que fazer:
+**Task simples**: criar/atualizar task com `markdown_description` + tags.
 
-**Se task simples (sem doc page, sem subtasks):**
-
-1. **Criar a task** no ClickUp (se ainda não existe):
-   ```
-   mcp__clickup__clickup_create_task
-     name: "{nome}"
-     list_id: 901322873791
-     markdown_description: {template simples}
-     tags: ["{tag1}"]
-   ```
-   Ou **atualizar a task existente**:
-   ```
-   mcp__clickup__clickup_update_task
-     task_id: "{id}"
-     markdown_description: {template simples}
-   ```
-
-2. **Adicionar tags** relevantes à task.
-
-3. **Mostrar resultado final** com link da task.
-
-**Se task complexa (fluxo completo):**
-
-1. **Criar doc page** no ClickUp Docs sob Planos Técnicos:
-   ```
-   mcp__clickup__clickup_create_document_page
-     document_id: "2ky5ajyw-1133"
-     name: "TECH-XXX — {título}"
-     parent_page_id: "2ky5ajyw-5873"
-     content: {conteúdo completo do plano em markdown}
-     content_format: "text/md"
-   ```
-   Guardar o `id` retornado para montar o link: `https://app.clickup.com/90132794332/v/dc/2ky5ajyw-1133/{page_id}`
-
-2. **Atualizar a task description** com link + resumo, e **adicionar tag `refine-ai`**:
-   ```
-   mcp__clickup__clickup_update_task
-     task_id: "TECH-XXX"
-     markdown_description: {template da task description com link do doc}
-   ```
-   Em seguida:
-   ```
-   mcp__clickup__clickup_add_tag_to_task
-     task_id: "TECH-XXX"
-     tag_name: "refine-ai"
-   ```
-
-3. **Criar cada subtask** (com description + tags em 1 chamada):
-   ```
-   mcp__clickup__clickup_create_task
-     name: "{nome da subtask}"
-     list_id: {list_id da task pai}
-     parent: "{id interno da task pai}"
-     markdown_description: "{template da subtask}"
-     tags: ["{tag1}", "{tag2}"]
-   ```
-
-4. **Mostrar resultado final**:
-   > **Publicado!**
-   > - Doc: {link da doc page}
-   > - Task atualizada: {link da task}
-   > - Subtasks criadas:
-   >   | # | Nome | Tags | Link |
-   >   |---|------|------|------|
-   >   | 1 | {nome} | `{tag}` | {url} |
+**Task complexa**:
+1. Criar doc page: `clickup_create_document_page(document_id: "2ky5ajyw-1133", parent_page_id: "2ky5ajyw-5873", name, content, content_format: "text/md")`
+   Link: `https://app.clickup.com/90132794332/v/dc/2ky5ajyw-1133/{page_id}`
+2. Atualizar task: `clickup_update_task(task_id, markdown_description)` + `clickup_add_tag_to_task(tag_name: "refine-ai")`
+3. Criar subtasks: `clickup_create_task(name, list_id, parent: "{id_pai}", markdown_description, tags)`
+4. Mostrar: links (doc, task, subtasks)
 
 ---
 
-## Regras gerais
+## Regras
 
-- **MCP para escrita**: SEMPRE usar MCP (`mcp__clickup__*`) para criar/atualizar tasks, subtasks, doc pages e tags. NÃO usar os scripts para escrita.
-- **Scripts para leitura local**: os arquivos em `clickup/` são úteis para consulta rápida sem API calls, mas podem estar desatualizados (sync a cada 30min).
-- **Nomes de subtasks**: limpos e descritivos. SEM prefixos como `[Backend]` ou `[Frontend]`. Usar TAGS para categorizar.
-- **Tags**: usar apenas as disponíveis: `backend`, `frontend`, `design`, `cms-api`, `grafana-prometheus`, `débito`
-- **Figma**: verificar apenas nos attachments da task já carregada. NÃO fazer busca adicional em docs. Se não existir, declarar explicitamente.
-- **Código**: ler os arquivos previsíveis pelo padrão NestJS diretamente (Read/Grep). Subagent Explore só se o módulo for genuinamente desconhecido. Não assumir estrutura.
-- **Decisões**: respeitar `decisions/` como fonte de verdade. Se o plano contradiz uma decisão, alertar.
-- **Escopo**: sempre listar "O que NÃO muda" para evitar scope creep.
+- **Escrita**: MCP. **Leitura**: local sync (pode estar 30min desatualizado)
+- **Nomes**: limpos, sem prefixos [Backend]. Usar tags
+- **Código**: Read/Grep direto. Explore só em último caso
+- **Decisões**: respeitar `decisions/`. Alertar se plano contradiz
+- **Escopo**: sempre listar "O que NÃO muda"

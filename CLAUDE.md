@@ -100,6 +100,33 @@ Sempre que possível, incluir no topo:
 - Priorize clareza > volume de texto
 - Evite complexidade desnecessária: proponha opções simples antes de sofisticadas
 
+## Self-Improvement Loop
+
+- Após QUALQUER correção do usuário: atualizar `memory/` com o padrão para não repetir o erro
+- Nunca repetir o mesmo erro duas vezes na mesma sessão
+- Ao iniciar sessão em projeto relevante: revisar lições anteriores na memory antes de agir
+
+## Verificação Antes de Concluir
+
+- Nunca marcar tarefa como concluída sem provar que funciona (build passou, teste rodou, comportamento confirmado)
+- Quando relevante: diff de comportamento entre `main` e a branch da task
+- Sempre perguntar internamente: "Um staff engineer aprovaria essa abordagem?"
+- Executar tests, checar logs, demonstrar corretude — não apenas afirmar
+
+## Demanda de Elegância
+
+- Para mudanças não-triviais: pausar e avaliar "existe uma solução mais simples e elegante?"
+- Após uma fix medíocre: propor "Knowing everything I know now, here's the elegant solution"
+- Não aplicar em correções simples e óbvias — não engenheirar demais
+- Desafiar o usuário quando houver complexidade desnecessária na abordagem
+
+## Prompting e Revisão
+
+- Ao fechar implementação: oferecer "Grill mode" — revisar mudanças como staff engineer antes de abrir PR
+- Para validar comportamento: comparar diff vs. main e explicar cada mudança
+- Specs detalhadas upfront = output melhor — incentivar o usuário a reduzir ambiguidade antes de iniciar
+- Ao receber bug report: resolver autonomamente (logs → root cause → fix → PR), sem pedir confirmação de cada passo
+
 ## Gestão de sessão e consumo
 
 - **Ao completar uma entrega** (plano publicado no ClickUp, task implementada, decisão documentada): sugerir `> 💡 Entrega concluída — considere `/clear` para resetar o contexto e reduzir consumo de tokens na próxima tarefa.`

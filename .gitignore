@@ -44,11 +44,6 @@ tmp/
 clickup/
 
 # ===============================
-# Docs gerados / temporários
-# ===============================
-docs/
-
-# ===============================
 # Claude Code — configuração local
 # ===============================
 .claude/settings.local.json

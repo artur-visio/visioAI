@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "figma": {
+      "type": "stdio",
+      "command": "/opt/homebrew/bin/npx",
+      "args": [
+        "-y",
+        "figma-developer-mcp",
+        "--stdio",
+        "--figma-api-key",
+        "YOUR_FIGMA_API_KEY"
+      ],
+      "env": {}
+    },
+    "figma-desktop": {
+      "type": "http",
+      "url": "http://127.0.0.1:3845/mcp"
+    },
+    "ClaudeTalkToFigma": {
+      "command": "/Users/YOUR_USER/.bun/bin/bun",
+      "args": [
+        "run",
+        "/tmp/claude-talk-to-figma-mcp/dist/talk_to_figma_mcp/server.js"
+      ]
+    }
+  }
+}

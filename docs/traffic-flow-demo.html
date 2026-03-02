@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VISIO — Live Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+
+    /* ── Layout ── */
+    .sidebar {
+      position:fixed; top:0; left:0; bottom:0; z-index:1001;
+      width:48px; background:white; border-right:1px solid #e5e7eb;
+      display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:4px;
+    }
+    .s-item {
+      width:36px; height:36px; border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:#6b7280;
+    }
+    .s-item.active { background:#d9f99d; color:#111827; }
+
+    .header {
+      position:fixed; top:0; left:48px; right:0; z-index:1000;
+      background:white; border-bottom:1px solid #e5e7eb;
+      padding:9px 14px; display:flex; align-items:center; gap:8px; height:49px;
+    }
+    .search {
+      display:flex; align-items:center; gap:8px;
+      border:1px solid #d1d5db; border-radius:8px;
+      padding:6px 11px; width:280px;
+    }
+    .search input { border:none; outline:none; font-size:13px; width:100%; color:#374151; }
+
+    .btn {
+      border:1px solid #d1d5db; border-radius:20px;
+      padding:5px 13px; font-size:12px; cursor:pointer;
+      background:white; color:#374151;
+      display:flex; align-items:center; gap:6px; white-space:nowrap;
+      transition:all .15s;
+    }
+    .btn.active-dark   { background:#111827; color:white; border-color:#111827; }
+    .btn.active-amber  { background:#d97706; color:white; border-color:#d97706; }
+    .btn.active-violet { background:#7c3aed; color:white; border-color:#7c3aed; }
+    .btn.active-green  { background:#16a34a; color:white; border-color:#16a34a; }
+
+    #map { position:fixed; top:49px; left:48px; right:0; bottom:0; }
+
+    .chips {
+      position:fixed; top:61px; left:64px; z-index:900;
+      display:flex; gap:7px; padding:8px 0;
+    }
+    .chip {
+      background:white; border:1px solid #d1d5db; border-radius:20px;
+      padding:4px 11px; font-size:12px; color:#374151;
+      box-shadow:0 1px 3px rgba(0,0,0,.07);
+    }
+
+    /* ── Legend ── */
+    .legend {
+      position:fixed; bottom:24px; left:64px; z-index:900;
+      background:white; border-radius:12px; padding:13px 15px;
+      box-shadow:0 2px 12px rgba(0,0,0,.12); min-width:185px;
+      display:none;
+    }
+    .legend.show { display:block; }
+    .leg-title { font-size:10px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.5px; margin-bottom:9px; }
+    .leg-row { display:flex; align-items:center; gap:8px; font-size:12px; color:#4b5563; margin-bottom:5px; }
+    .leg-line { width:26px; height:5px; border-radius:3px; }
+    .leg-dot  { width:7px; height:7px; border-radius:50%; }
+
+    /* ── Side panel ── */
+    .panel {
+      position:fixed; top:49px; right:0; bottom:0; z-index:900;
+      width:290px; background:white; border-left:1px solid #e5e7eb;
+      display:flex; flex-direction:column;
+      transform:translateX(290px); transition:transform .2s ease;
+    }
+    .panel.open { transform:translateX(0); }
+    .ph {
+      padding:12px 14px; border-bottom:1px solid #f3f4f6;
+      display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+    }
+    .ph h3 { font-size:13px; font-weight:600; color:#111827; }
+    .ph button { background:none; border:none; cursor:pointer; color:#9ca3af; font-size:15px; }
+    .pb { flex:1; overflow-y:auto; }
+
+    /* ── Detection items ── */
+    .det {
+      padding:11px 14px; border-bottom:1px solid #f9fafb;
+      cursor:pointer; transition:background .1s; display:flex; gap:10px; align-items:flex-start;
+    }
+    .det:hover { background:#f9fafb; }
+    .det.alert-item { background:#fff5f5; border-left:3px solid #ef4444; }
+
+    /* Thumbnail */
+    .thumb {
+      width:44px; height:44px; border-radius:6px; flex-shrink:0;
+      overflow:hidden; background:#f3f4f6;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .thumb svg { width:100%; height:100%; }
+
+    .det-info { flex:1; min-width:0; }
+    .det-id   { font-size:12px; font-weight:700; color:#111827; font-family:'Courier New',monospace; }
+    .det-cam  { font-size:11px; color:#6b7280; margin-top:2px; }
+    .det-time { font-size:10px; color:#9ca3af; margin-top:3px; }
+
+    .badge {
+      display:inline-flex; align-items:center; gap:3px;
+      padding:1px 7px; border-radius:10px; font-size:10px; font-weight:600;
+    }
+    .badge.unknown { background:#f3f4f6; color:#4b5563; }
+    .badge.alert   { background:#fee2e2; color:#b91c1c; }
+    .badge.livre   { background:#dcfce7; color:#15803d; }
+    .badge.mod     { background:#fef9c3; color:#854d0e; }
+    .badge.int     { background:#fee2e2; color:#b91c1c; }
+
+    /* ── Marker labels ── */
+    .lpr-label {
+      background:rgba(17,24,39,.88); color:#f0fdf4;
+      font-size:10px; font-family:'Courier New',monospace; font-weight:700;
+      letter-spacing:.8px; padding:2px 7px; border-radius:4px;
+      white-space:nowrap; box-shadow:0 1px 4px rgba(0,0,0,.4);
+      border:1px solid rgba(255,255,255,.15);
+    }
+    .lpr-label.mod { background:rgba(217,119,6,.92); }
+    .lpr-label.int { background:rgba(185,28,28,.92); }
+
+    /* ── Pulse rings ── */
+    .pulse-ring {
+      width:24px; height:24px; border-radius:50%; border:2px solid;
+      animation:ringOut .9s ease-out forwards;
+    }
+    @keyframes ringOut {
+      0%   { transform:scale(1);   opacity:.95; }
+      100% { transform:scale(3);   opacity:0;   }
+    }
+    .pulse-ring.unknown { border-color:#a78bfa; }
+    .pulse-ring.alert   { border-color:#ef4444; animation:ringOut .7s ease-out forwards, alertBlink .35s infinite alternate; }
+    @keyframes alertBlink { to { border-color:#fca5a5; } }
+
+    /* ── Volume halo ── */
+    .vol-halo {
+      border-radius:50%; border:1.5px solid;
+      pointer-events:none; transition:all .6s ease;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .live { width:7px; height:7px; border-radius:50%; animation:blink 1.5s infinite; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="s-item">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </div>
+  <div class="s-item" style="margin-top:8px">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+  </div>
+  <div class="s-item active" style="margin-top:auto">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline stroke-width="2" points="9 22 9 12 15 12 15 22"/></svg>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="search">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Busque por câmera, ponto ou bairro" />
+  </div>
+  <button class="btn active-dark">✓ Ativo</button>
+  <button class="btn">× Limpar filtros</button>
+  <div style="flex:1"></div>
+  <button class="btn" id="btnTraffic" onclick="toggleLayer('traffic')">
+    <div class="live" style="background:#22c55e"></div> Fluxo
+  </button>
+  <button class="btn active-amber" id="btnLpr" onclick="toggleLayer('lpr')">
+    <div class="live" style="background:white"></div> LPR ao vivo
+  </button>
+  <button class="btn" id="btnFace" onclick="toggleLayer('face')">
+    <div class="live" style="background:#a78bfa"></div> Faciais ao vivo
+  </button>
+</div>
+
+<!-- Chips -->
+<div class="chips">
+  <div class="chip">📍 2 Pontos</div>
+  <div class="chip">🎥 7 Câmeras</div>
+  <div class="chip">👤 5 Faciais</div>
+  <div class="chip">🚗 2 LPR</div>
+</div>
+
+<!-- Map -->
+<div id="map"></div>
+
+<!-- Legend (traffic) -->
+<div class="legend" id="legend">
+  <div class="leg-title">Fluxo de veículos</div>
+  <div class="leg-row"><div class="leg-line" style="background:#22c55e"></div> Livre (&lt;20/5min)</div>
+  <div class="leg-row"><div class="leg-line" style="background:#f59e0b"></div> Moderado (20–50)</div>
+  <div class="leg-row"><div class="leg-line" style="background:#ef4444"></div> Intenso (&gt;50)</div>
+</div>
+
+<!-- Panel -->
+<div class="panel" id="panel">
+  <div class="ph">
+    <h3 id="panelTitle">—</h3>
+    <button onclick="document.getElementById('panel').classList.remove('open')">✕</button>
+  </div>
+  <div class="pb" id="panelBody"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// MAP
+// ─────────────────────────────────────────────
+const map = L.map('map', { zoomControl:false }).setView([-26.3044, -48.8459], 14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution:'© OpenStreetMap', maxZoom:19,
+}).addTo(map);
+L.control.zoom({ position:'bottomright' }).addTo(map);
+
+// ─────────────────────────────────────────────
+// CAMERAS
+// ─────────────────────────────────────────────
+const cameras = [
+  { id:'CAM-001', name:'Av. Beira Rio',       lat:-26.3020, lng:-48.8470 },
+  { id:'CAM-002', name:'Av. Getúlio Vargas',  lat:-26.3010, lng:-48.8560 },
+  { id:'CAM-003', name:'Av. Santos Dumont',   lat:-26.3050, lng:-48.8470 },
+  { id:'CAM-005', name:'Rua Blumenau',        lat:-26.3010, lng:-48.8430 },
+  { id:'CAM-006', name:'R. Min. Calógeras',   lat:-26.3140, lng:-48.8450 },
+  { id:'CAM-007', name:'Rua 9 de Março',      lat:-26.2890, lng:-48.8440 },
+];
+
+// Dot marker per camera
+cameras.forEach(cam => {
+  const icon = L.divIcon({
+    html:`<div style="width:9px;height:9px;border-radius:50%;background:#111827;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`,
+    iconSize:[9,9], iconAnchor:[4,4], className:'',
+  });
+  L.marker([cam.lat, cam.lng], { icon })
+    .bindTooltip(`${cam.id} · ${cam.name}`, { direction:'top', offset:[0,-8] })
+    .addTo(map);
+});
+
+// Clusters
+[[-26.3010,-48.8460,3],[-26.3140,-48.8470,4]].forEach(([lat,lng,n]) => {
+  const icon = L.divIcon({
+    html:`<div style="width:28px;height:28px;border-radius:50%;background:#111827;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,.3)">${n}</div>`,
+    iconSize:[28,28], iconAnchor:[14,14], className:'',
+  });
+  L.marker([lat,lng],{icon}).addTo(map);
+});
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function lerp(a,b,t){ return a+(b-a)*t; }
+function now(){ return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ─────────────────────────────────────────────
+// LAYER 1 — TRAFFIC FLOW
+// ─────────────────────────────────────────────
+const roads = [
+  { coords:[[-26.2980,-48.8490],[-26.3050,-48.8470],[-26.3120,-48.8450]], count:38 },
+  { coords:[[-26.3010,-48.8530],[-26.3010,-48.8430],[-26.3010,-48.8340]], count:64 },
+  { coords:[[-26.3130,-48.8490],[-26.3080,-48.8480],[-26.3020,-48.8470]], count:12 },
+  { coords:[[-26.2820,-48.8430],[-26.2890,-48.8440],[-26.2960,-48.8450]], count:71 },
+  { coords:[[-26.3000,-48.8620],[-26.3010,-48.8560],[-26.3020,-48.8500]], count:29 },
+  { coords:[[-26.3180,-48.8440],[-26.3140,-48.8450],[-26.3090,-48.8455]], count:55 },
+];
+function flowColor(n){ return n<20?'#22c55e':n<50?'#f59e0b':'#ef4444'; }
+const trafficLayer = L.layerGroup();
+roads.forEach(r=>{
+  L.polyline(r.coords,{color:'white',weight:10,opacity:.45}).addTo(trafficLayer);
+  L.polyline(r.coords,{color:flowColor(r.count),weight:6,opacity:.85,lineCap:'round'}).addTo(trafficLayer);
+});
+
+// ─────────────────────────────────────────────
+// LAYER 2 — LPR (vehicles)
+// ─────────────────────────────────────────────
+const plates   = ['ABC-1D34','QWE-5F78','ZXC-2G90','RTY-8H12','MNB-4J56','LKJ-7K23','POI-3L45','UYT-9M67'];
+const lprRoutes = [
+  {from:0,to:2,color:''   },
+  {from:1,to:3,color:'mod'},
+  {from:3,to:5,color:'int'},
+  {from:5,to:0,color:''   },
+  {from:2,to:4,color:'mod'},
+  {from:4,to:1,color:'int'},
+  {from:0,to:3,color:''   },
+  {from:2,to:5,color:'mod'},
+];
+
+const lprLayer  = L.layerGroup();
+let lprMarkers  = [];
+let lprAF;
+let lprEvents   = [];
+
+// SVG frame simulando captura de câmera com carro
+function carFrameSvg(plate, colorClass){
+  const bg    = colorClass==='int'?'#7f1d1d':colorClass==='mod'?'#78350f':'#1e3a1e';
+  const plate2= plate.replace('-',' ');
+  return `
+  <svg viewBox="0 0 88 56" xmlns="http://www.w3.org/2000/svg">
+    <rect width="88" height="56" fill="${bg}" rx="3"/>
+    <!-- noise overlay -->
+    <rect width="88" height="56" fill="url(#noise)" opacity=".18" rx="3"/>
+    <defs>
+      <filter id="blur1"><feGaussianBlur stdDeviation=".4"/></filter>
+    </defs>
+    <!-- car silhouette -->
+    <g transform="translate(10,14)" filter="url(#blur1)" opacity=".85">
+      <rect x="8" y="12" width="50" height="16" rx="2" fill="#94a3b8"/>
+      <rect x="14" y="6"  width="36" height="14" rx="3" fill="#cbd5e1"/>
+      <circle cx="18" cy="28" r="5" fill="#334155"/><circle cx="18" cy="28" r="3" fill="#64748b"/>
+      <circle cx="48" cy="28" r="5" fill="#334155"/><circle cx="48" cy="28" r="3" fill="#64748b"/>
+      <rect x="16" y="7"  width="15" height="11" rx="1" fill="#7dd3fc" opacity=".6"/>
+      <rect x="35" y="7"  width="13" height="11" rx="1" fill="#7dd3fc" opacity=".6"/>
+    </g>
+    <!-- plate box -->
+    <rect x="22" y="38" width="44" height="13" rx="2" fill="white" opacity=".92"/>
+    <text x="44" y="48" text-anchor="middle" font-size="7.5" font-weight="800" font-family="monospace" fill="#111827" letter-spacing="1">${plate2}</text>
+    <!-- scanline -->
+    <rect width="88" height="2" y="22" fill="white" opacity=".06"/>
+    <rect width="88" height="1" y="40" fill="white" opacity=".06"/>
+    <!-- corner brackets -->
+    <path d="M3,10 L3,3 L10,3" stroke="#4ade80" stroke-width="1.5" fill="none"/>
+    <path d="M78,10 L78,3 L71,3" stroke="#4ade80" stroke-width="1.5" fill="none"/>
+    <path d="M3,46 L3,53 L10,53" stroke="#4ade80" stroke-width="1.5" fill="none"/>
+    <path d="M78,46 L78,53 L71,53" stroke="#4ade80" stroke-width="1.5" fill="none"/>
+  </svg>`;
+}
+
+function spawnVehicle(route, plate, offset=0){
+  const from    = cameras[route.from];
+  const to      = cameras[route.to];
+  const dur     = 8000 + Math.random()*6000;
+  const start   = performance.now() - offset*dur;
+  const icon    = L.divIcon({
+    html:`<div class="lpr-label ${route.color}">${plate}</div>`,
+    iconSize:[84,18], iconAnchor:[42,9], className:'',
+  });
+  const marker  = L.marker([from.lat,from.lng],{icon,zIndexOffset:1000}).addTo(lprLayer);
+
+  const badgeCls= route.color==='int'?'int':route.color==='mod'?'mod':'livre';
+  const badgeTxt= route.color==='int'?'Intenso':route.color==='mod'?'Moderado':'Livre';
+  lprEvents.unshift({ plate, cam:from.name, dest:to.name, time:now(), badge:badgeCls, badgeTxt, route });
+  if(lprEvents.length>25) lprEvents.pop();
+  if(lprOn) renderPanel('lpr');
+
+  return { marker, from, to, start, dur, plate, route, done:false };
+}
+
+function initLpr(){
+  lprMarkers.forEach(v=>v.marker.remove()); lprMarkers=[];
+  lprRoutes.forEach((r,i)=> lprMarkers.push(spawnVehicle(r, plates[i%plates.length], Math.random())));
+}
+
+function animLpr(ts){
+  lprMarkers.forEach((v,i)=>{
+    const t = ((ts-v.start)%v.dur)/v.dur;
+    v.marker.setLatLng([lerp(v.from.lat,v.to.lat,t), lerp(v.from.lng,v.to.lng,t)]);
+    if(t>0.98 && !v.done){
+      v.done=true;
+      setTimeout(()=>{ v.marker.remove(); lprMarkers[i]=spawnVehicle(rand(lprRoutes),rand(plates)); },400);
+    }
+  });
+  if(lprOn) lprAF=requestAnimationFrame(animLpr);
+}
+
+let lprOn = true;
+
+// ─────────────────────────────────────────────
+// LAYER 3 — FACIAL
+// ─────────────────────────────────────────────
+const pulseLayer = L.layerGroup().addTo(map);
+const haloLayer  = L.layerGroup();
+
+// Track detection count per camera for volume halo
+const camCounts  = {};
+cameras.forEach(c=>{ camCounts[c.id]=0; });
+const haloMarkers= {};
+
+function updateHalo(cam){
+  const count = camCounts[cam.id];
+  if(haloMarkers[cam.id]) haloMarkers[cam.id].remove();
+  if(!faceOn || count===0) return;
+
+  const r      = 60 + count*18;   // radius in metres
+  const opacity= Math.min(0.12 + count*0.04, 0.45);
+  const color  = count>=4?'#ef4444':'#a78bfa';
+
+  haloMarkers[cam.id] = L.circle([cam.lat,cam.lng],{
+    radius:r, color, fillColor:color, fillOpacity:opacity, weight:1.5, opacity:.5,
+  }).addTo(haloLayer);
+}
+
+const faceTypes = [
+  { type:'unknown', label:'Desconhecido' },
+  { type:'unknown', label:'Desconhecido' },
+  { type:'unknown', label:'Desconhecido' },
+  { type:'alert',   label:'⚠ Alerta Watchlist' },
+];
+
+let faceOn     = false;
+let faceEvents = [];
+let faceTimer;
+
+// SVG face capture frame
+function faceSvg(type){
+  const bg   = type==='alert'?'#450a0a':'#1a1a2e';
+  const ring = type==='alert'?'#ef4444':'#a78bfa';
+  return `
+  <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+    <rect width="56" height="56" fill="${bg}" rx="3"/>
+    <!-- face oval blur -->
+    <ellipse cx="28" cy="24" rx="12" ry="14" fill="#94a3b8" opacity=".3"/>
+    <!-- head shape -->
+    <ellipse cx="28" cy="21" rx="9"  ry="11" fill="#cbd5e1" opacity=".55"/>
+    <!-- eyes -->
+    <ellipse cx="24" cy="20" rx="2"  ry="2.2" fill="#475569" opacity=".8"/>
+    <ellipse cx="32" cy="20" rx="2"  ry="2.2" fill="#475569" opacity=".8"/>
+    <!-- shoulder -->
+    <path d="M14,44 Q28,36 42,44" stroke="#94a3b8" stroke-width="5" fill="none" opacity=".4"/>
+    <!-- scan line -->
+    <rect width="56" height="1.5" y="28" fill="${ring}" opacity=".35"/>
+    <!-- corner brackets -->
+    <path d="M4,11 L4,4 L11,4"   stroke="${ring}" stroke-width="1.5" fill="none"/>
+    <path d="M45,11 L45,4 L38,4" stroke="${ring}" stroke-width="1.5" fill="none"/>
+    <path d="M4,45 L4,52 L11,52" stroke="${ring}" stroke-width="1.5" fill="none"/>
+    <path d="M45,45 L45,52 L38,52" stroke="${ring}" stroke-width="1.5" fill="none"/>
+    ${type==='alert'?'<rect width="56" height="56" fill="#ef4444" opacity=".06" rx="3"/><text x="28" y="53" text-anchor="middle" font-size="5.5" font-weight="700" fill="#fca5a5" font-family="sans-serif">ALERTA</text>':''}
+  </svg>`;
+}
+
+function fireFaceDetection(){
+  if(!faceOn) return;
+  const cam  = rand(cameras);
+  const ft   = rand(faceTypes);
+
+  // Pulse ring
+  const ringIcon = L.divIcon({
+    html:`<div class="pulse-ring ${ft.type}"></div>`,
+    iconSize:[24,24], iconAnchor:[12,12], className:'',
+  });
+  const ring = L.marker([cam.lat,cam.lng],{icon:ringIcon,zIndexOffset:2000}).addTo(pulseLayer);
+  setTimeout(()=>ring.remove(), 950);
+
+  // Extra rings on alert
+  if(ft.type==='alert'){
+    [300,600].forEach(delay=>{
+      setTimeout(()=>{
+        const r2=L.marker([cam.lat,cam.lng],{icon:ringIcon,zIndexOffset:1999}).addTo(pulseLayer);
+        setTimeout(()=>r2.remove(),950);
+      },delay);
+    });
+  }
+
+  // Update halo volume
+  camCounts[cam.id] = Math.min((camCounts[cam.id]||0)+1, 8);
+  updateHalo(cam);
+  setTimeout(()=>{ camCounts[cam.id]=Math.max(0,camCounts[cam.id]-1); updateHalo(cam); }, 15000);
+
+  // Event
+  const id = 'FACE-'+Math.floor(1000+Math.random()*9000);
+  faceEvents.unshift({ id, type:ft.type, label:ft.label, cam:cam.name, camId:cam.id, time:now() });
+  if(faceEvents.length>30) faceEvents.pop();
+  renderPanel('face');
+}
+
+// ─────────────────────────────────────────────
+// PANEL RENDERING
+// ─────────────────────────────────────────────
+let activePanel = 'lpr';
+
+function renderPanel(mode){
+  activePanel = mode;
+  const title = document.getElementById('panelTitle');
+  const body  = document.getElementById('panelBody');
+  document.getElementById('panel').classList.add('open');
+
+  if(mode==='lpr'){
+    title.textContent = 'Detecções LPR';
+    body.innerHTML = lprEvents.map(e=>`
+      <div class="det">
+        <div class="thumb">${carFrameSvg(e.plate, e.route.color)}</div>
+        <div class="det-info">
+          <div class="det-id">${e.plate}</div>
+          <div class="det-cam">${e.cam}</div>
+          <div class="det-time">${e.time} · <span class="badge ${e.badge}">${e.badgeTxt}</span></div>
+        </div>
+      </div>`).join('');
+  } else {
+    title.textContent = 'Detecções Faciais';
+    body.innerHTML = faceEvents.map(e=>`
+      <div class="det ${e.type==='alert'?'alert-item':''}">
+        <div class="thumb">${faceSvg(e.type)}</div>
+        <div class="det-info">
+          <div class="det-id">${e.id}</div>
+          <div class="det-cam">${e.cam}</div>
+          <div class="det-time">${e.time} · <span class="badge ${e.type}">${e.label}</span></div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+// ─────────────────────────────────────────────
+// TOGGLE
+// ─────────────────────────────────────────────
+let trafficOn = false;
+
+const btnMap = {
+  traffic:{ el:'btnTraffic', cls:'active-green' },
+  lpr:    { el:'btnLpr',     cls:'active-amber'  },
+  face:   { el:'btnFace',    cls:'active-violet' },
+};
+
+function toggleLayer(layer){
+  if(layer==='traffic'){
+    trafficOn=!trafficOn;
+    const btn=document.getElementById('btnTraffic');
+    if(trafficOn){ trafficLayer.addTo(map); btn.className='btn active-green'; document.getElementById('legend').classList.add('show'); }
+    else          { map.removeLayer(trafficLayer); btn.className='btn'; document.getElementById('legend').classList.remove('show'); }
+  }
+  if(layer==='lpr'){
+    lprOn=!lprOn;
+    const btn=document.getElementById('btnLpr');
+    if(lprOn){
+      lprLayer.addTo(map); initLpr(); lprAF=requestAnimationFrame(animLpr);
+      btn.className='btn active-amber'; renderPanel('lpr');
+    } else {
+      cancelAnimationFrame(lprAF); map.removeLayer(lprLayer); lprMarkers=[];
+      btn.className='btn';
+    }
+  }
+  if(layer==='face'){
+    faceOn=!faceOn;
+    const btn=document.getElementById('btnFace');
+    if(faceOn){
+      haloLayer.addTo(map);
+      faceTimer=setInterval(fireFaceDetection, 1200+Math.random()*800);
+      btn.className='btn active-violet'; renderPanel('face');
+    } else {
+      clearInterval(faceTimer); map.removeLayer(haloLayer);
+      Object.keys(haloMarkers).forEach(k=>{ if(haloMarkers[k]) haloMarkers[k].remove(); });
+      cameras.forEach(c=>{ camCounts[c.id]=0; });
+      btn.className='btn';
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+lprLayer.addTo(map);
+initLpr();
+lprAF = requestAnimationFrame(animLpr);
+renderPanel('lpr');
+</script>
+</body>
+</html>

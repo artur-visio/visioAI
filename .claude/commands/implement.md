@@ -65,6 +65,8 @@ Apresentar: branch, agents ativados (com subtasks), agents não necessários, ta
 cd repos/plataforma && git checkout main && git pull origin main && git checkout -b feature/$ARGUMENTS-{slug}
 ```
 
+> **CRÍTICO — nunca puxar `dev` para dentro da feature branch.** Se houver conflito ao abrir PR para dev, resolver via rebase na feature branch (`git rebase origin/dev`) ou cherry-pick — mas NUNCA `git merge origin/dev` dentro da feature. A feature branch deve conter apenas os commits da task, pois o mesmo branch será usado para o PR para `main`.
+
 ### Ordem de dependência
 1. Backend em paralelo: `cms-api`, `streaming`, `temporal-worker`, `camera-webhook`
 2. `db-migration` — após cms-api
@@ -228,19 +230,18 @@ Apresentar: build/types/review status, branch, commits (hash + mensagem), tabela
 ```
 Task(Bash, model: haiku)
   "cd repos/plataforma && git log main..HEAD --oneline && git push origin feature/$ARGUMENTS-{slug}
-   gh pr create --base dev --title '$ARGUMENTS: {título}' --body '## Task\n[link]\n## Plano\n{link}\n## Feito\n{resumo}\n## Agents\n{lista}\n## Checklist\n- [ ] Build\n- [ ] Types\n- [ ] Migration\n- [ ] Critérios\n- [ ] Testado em dev\n\n🤖 /implement $ARGUMENTS'
-   Retornar: URL do PR."
+
+   # PR 1: feature → dev (NÃO usar --delete-branch)
+   gh pr create --base dev --head feature/$ARGUMENTS-{slug} --title '$ARGUMENTS: {título}' --body '## Task\n[link]\n## Plano\n{link}\n## Feito\n{resumo}\n## Agents\n{lista}\n## Checklist\n- [ ] Build\n- [ ] Types\n- [ ] Migration\n- [ ] Critérios\n- [ ] Testado em dev\n\n🤖 /implement $ARGUMENTS'
+
+   # PR 2: feature → main (mesma branch, abrir junto)
+   gh pr create --base main --head feature/$ARGUMENTS-{slug} --title '$ARGUMENTS: {título}' --body '## Task\n[link]\n## Feito\n{resumo}\n## Checklist\n- [ ] Build\n- [ ] Types\n- [ ] Migration\n- [ ] Critérios\n- [ ] Validado em dev\n\n🤖 /implement $ARGUMENTS'
+
+   Retornar: URLs dos dois PRs."
 ```
 
----
-
-## CHECKPOINT 3 — PR PARA MAIN (manual)
-
-Ao receber "sobe para prod" ou `/implement $ARGUMENTS --to-main`:
-```
-Task(Bash, model: haiku)
-  "gh pr create --base main --head feature/$ARGUMENTS-{slug} --title '$ARGUMENTS: {título}' --body 'Validado em dev.'"
-```
+> **Nunca usar `--delete-branch` no merge do PR para dev** — a branch precisa sobreviver para o PR para main.
+> **Nunca mergear dev na feature branch** — se houver conflito, resolver via rebase (`git rebase origin/main`) na feature.
 
 ---
 

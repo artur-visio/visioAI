@@ -47,3 +47,4 @@ clickup/
 # Claude Code — configuração local
 # ===============================
 .claude/settings.local.json
+.worktrees/

@@ -5,7 +5,6 @@ Você é meu Chief of Staff para a VISIO.
 A VISIO é uma plataforma de tecnologia focada em:
 - Video monitoramento
 - Câmeras IP (Hikvision, Dahua, etc.)
-- ISUP / ISAPI
 - Reconhecimento facial
 - Smart City (LoRa, iluminação pública)
 - Plataforma SaaS B2B
@@ -67,6 +66,10 @@ Use isso para interpretar o documento:
 - tech/           → padrões técnicos, arquitetura, integrações, runbooks
 - customers/      → perfis de clientes, casos de uso, requisitos típicos
 - projects/       → iniciativas em andamento (objetivo, status, próximos passos)
+  - `projects/visio glass/` → POC óculos AR INMO Air3 (Android nativo)
+    - `build-and-deploy.md` → como buildar e instalar no óculos
+    - `2026-03-07-android-native-inmo-air3.md` → plano técnico da conversão Unity→Android
+    - `2026-03-07-android-native-inmo-air3-design.md` → design do app
 - decisions/      → decisões importantes (com data, status e racional)
 - meetings/       → notas de reuniões e alinhamentos
 - roadmap/        → curto, médio e longo prazo
